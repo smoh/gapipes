@@ -2,15 +2,14 @@ import os
 import io
 import logging
 import six
+import getpass
 import requests
 from requests.exceptions import HTTPError
-import getpass
 
 from astropy import units
 from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
-from astroquery.gaia import taputils
-from astroquery.gaia import utils
+from . import utils
 
 
 logger = logging.getLogger(__name__)
@@ -78,29 +77,17 @@ class Tap(object):
         else:
             return self._tables
 
-    # TODO: clean up all dump_to_file leftover
-    def _post_query(self, query, name=None, output_file=None,
-                   output_format="votable", verbose=False,
-                   upload_resource=None, upload_table_name=None,
-                   async_=False,
-                   dump_to_file=False, autorun=True):
+    def _post_query(self, query, name=None,
+                    upload_resource=None, upload_table_name=None,
+                    async_=False):
         """POST synchronous or asynchronos query to Tap server
 
         Parameters
         ----------
-        query : str, mandatory
+        query : str
             query to be executed
-        output_file : str, optional, default None
-            file name where the results are saved if dump_to_file is True.
-            If this parameter is not provided, the jobid is used instead
-        output_format : str, optional, default 'votable'
-            results format
-        verbose : bool, optional, default 'False'
-            flag to display information about the process
         async_ : bool
             send asynchronous query if True
-        dump_to_file : bool, optional, default 'False'
-            if True, the results are saved in a file instead of using memory
         upload_resource: str, optional, default None
             resource to be uploaded to UPLOAD_SCHEMA
         upload_table_name: str, required if upload_resource is
@@ -112,8 +99,6 @@ class Tap(object):
         response : requests.Response
         """
         # TODO: docstring is missing what other output_format is available.
-        # TODO: I suggest to delegate output manipulation to users
-        #       and just return astropy Table.
         query = taputils.set_top_in_query(query, 2000)
 
         args = {
@@ -166,9 +151,8 @@ class Tap(object):
         #TODO parse response and return results
         return r
 
-    def query_async(self, query, name=None, output_file=None,
-                         output_format="votable", verbose=False,
-                         dump_to_file=False, background=False,
+    def query_async(self, query, name=None,
+                         output_format="votable",
                          upload_resource=None, upload_table_name=None,
                          autorun=True):
         """Launches an asynchronous job
@@ -227,10 +211,6 @@ class Tap(object):
         return '{cls:s}("{s.host:s}", "{s.path:s}", "{s.protocol:s}", {s.port:d})'\
             .format(s=self, cls=self.__class__.__name__)
 
-    def __str__(self):
-        return ("Created TAP+ (v"+VERSION+") - Connection:\n" +
-                str(self.connhandler))
-
 
 class GaiaTapPlus(Tap):
     """
@@ -240,7 +220,7 @@ class GaiaTapPlus(Tap):
                  server_context=None, upload_context=None):
                 #  table_edit_context=None, data_context=None,
                 #  datalink_context=None):
-        """Constructor
+        """TODO
 
         Parameters
         ----------
