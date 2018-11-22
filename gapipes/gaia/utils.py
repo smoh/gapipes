@@ -42,8 +42,13 @@ def parse_html_response_error(html):
 class ColumnMeta(
     namedtuple('ColumnMeta', ['name', 'unit', 'datatype', 'description'],
                defaults=['', '', '', ''])):
+    """
+    Column meta data
+    """
 
     def __repr__(self):
+        # NOTE: Column description can be very long. In order to have
+        # nice and useful info, truncate description.
         s = 'Column(name="{s.name:s}", unit="{s.unit:s}", description='\
             .format(s=self)
         remaining_length = 80-len(s)
@@ -52,12 +57,16 @@ class ColumnMeta(
         return s
     
     def __str__(self):
+        # Descriptions are printed in full when this class is printed.
         return "Column name: {s.name}\nunit: {s.unit}"\
                "\ndesription: {s.description}".format(s=self)
 
 
 class TableMeta(
     namedtuple('TableMeta', ['name', 'schema', 'description', 'columns'])):
+    """
+    Table meta data
+    """
 
     @property
     def as_table(self):
@@ -74,12 +83,19 @@ class TableMeta(
 
 class TableSet(list):
     """
-    a list of TableMeta that supports filtering
+    A list of TableMeta that supports filtering
     """
     
     def filter(self, schema=None, table=None):
         """
         Filter tables by schema or table name
+
+        Paramters
+        ---------
+        schema : str or list of str
+            schemas to get
+        table : str or list of str
+            tables to get
         """
         if schema is None and table is None:
             raise ValueError('Specify at least one of `schema` or `table`.')
