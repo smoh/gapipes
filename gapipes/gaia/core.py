@@ -21,24 +21,21 @@ __all__ = ['Tap', 'GaiaTapPlus']
 class Tap(object):
     """
     Table Acess Protocol service client
+
+    Parameters
+    ----------
+    host : str, required
+        host name
+    path : str, mandatory
+        server context
+    protocol : str, optional
+        access protocol, usually 'http' or 'https'
+    port : int, optional, default '80'
+        HTTP port
     """
     _tables = None
 
     def __init__(self, host, path, protocol='http', port=80):
-        """
-        Create TAP Service
-
-        Parameters
-        ----------
-        host : str, required
-            host name
-        path : str, mandatory
-            server context
-        protocol : str, optional
-            access protocol, usually 'http' or 'https'
-        port : int, optional, default '80'
-            HTTP port
-        """
         self.protocol = protocol
         self.host = host
         self.path = path
@@ -233,30 +230,28 @@ class Tap(object):
 class GaiaTapPlus(Tap):
     """
     Gaia TAP+ Service
+
+    Parameters
+    ----------
+    host : str, optional, default None
+        host name
+    server_context : str, optional, default None
+        server context
+    upload_context : str, optional, default None
+        upload context
+    table_edit_context : str, optional, default None
+        context for all actions to be performed over a existing table
+    data_context : str, optional, default None
+        data context
+    datalink_context : str, optional, default None
+        datalink context
+    verbose : bool, optional, default 'True'
+        flag to display information about the process
     """
     def __init__(self, host, path, protocol='http', port=80,
                  server_context=None, upload_context=None):
                 #  table_edit_context=None, data_context=None,
                 #  datalink_context=None):
-        """TODO
-
-        Parameters
-        ----------
-        host : str, optional, default None
-            host name
-        server_context : str, optional, default None
-            server context
-        upload_context : str, optional, default None
-            upload context
-        table_edit_context : str, optional, default None
-            context for all actions to be performed over a existing table
-        data_context : str, optional, default None
-            data context
-        datalink_context : str, optional, default None
-            datalink context
-        verbose : bool, optional, default 'True'
-            flag to display information about the process
-        """
 
         super(GaiaTapPlus, self).__init__(host, path, protocol=protocol, port=port)
 
