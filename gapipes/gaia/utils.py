@@ -96,8 +96,6 @@ class TableSet(list):
             filtered = list(filter(partial(check_table, table), filtered))
         return TableSet(filtered)
         
-        
-
 
 def parse_tableset(xml):
     """
@@ -108,7 +106,10 @@ def parse_tableset(xml):
     xml : str
         XML string to be parsed
     
-    Returns a list of TODO
+    Returns
+    -------
+    tables : TableSet
+        list of tables
     """
     root = ET.fromstring(xml)
     # save (schema, table name, table description) for each table
