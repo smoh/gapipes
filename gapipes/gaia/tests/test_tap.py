@@ -1,3 +1,4 @@
+import pytest
 from gapipes.gaia.core import Tap
 
 
@@ -14,3 +15,4 @@ class TestTap(object):
         tap = Tap.from_url("https://gea.esac.esa.int/tap-server/tap")
         assert tap.protocol == 'https', "Tap has a wrong protocol"
         assert tap.port == 443, "Tap has a wrong port"
+    

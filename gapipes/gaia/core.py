@@ -5,7 +5,9 @@ import six
 import getpass
 import requests
 from requests.exceptions import HTTPError
+import pandas as pd
 
+from astropy.table import Table
 from astropy import units
 from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
@@ -81,6 +83,8 @@ class Tap(object):
 
     def _post_query(self, query, name=None,
                     upload_resource=None, upload_table_name=None,
+                    output_format='csv',
+                    autorun=True,
                     async_=False):
         """POST synchronous or asynchronos query to Tap server
 
@@ -102,13 +106,11 @@ class Tap(object):
             response
         """
         # TODO: docstring is missing what other output_format is available.
-        query = taputils.set_top_in_query(query, 2000)
-
         args = {
             "REQUEST": "doQuery",
             "LANG": "ADQL",
             "FORMAT": str(output_format),
-            "tapclient": str(TAP_CLIENT_ID),
+            # "tapclient": str(TAP_CLIENT_ID),
             "QUERY": str(query)}
         # TODO: is autorun even necessary for sync jobs?
         if autorun is True:
@@ -116,6 +118,7 @@ class Tap(object):
         if name is not None:
             args['jobname'] = name
         url = self.tap_endpoint + ('/async' if async_ else '/sync')
+        logger.debug(args)
         
         if upload_resource is None:
             response = self.session.post(url, data=args)
@@ -130,22 +133,17 @@ class Tap(object):
                     upload_resource.write(f, format='votable')
                     f.seek(0)
                     chunk = f.read()
-                    name = 'pytable'
-                    args['format'] = 'votable'
             else:
                 with open(upload_resource, "r") as f:
                     chunk = f.read()
-                name = os.path.basename(upload_resource)
-            # TODO: It is possible to set content type explicitly but
-            #       it is not sure if that's necessary.
-            #       If not, remove variable `name`.
             files = {upload_table_name: chunk}
             response = self.session.post(url, data=args, files=files)
 
         if not response.raise_for_status():
             return response
     
-    def query(self, query, name=None, upload_resource=None, upload_table_name=None):
+    def query(self, query, name=None, upload_resource=None, upload_table_name=None,
+              output_format='csv'):
         """
         Synchronous query to TAP server
 
@@ -160,21 +158,24 @@ class Tap(object):
         upload_table_name: str, required if upload_resource is
             provided, default None
             resource temporary table name associated to the uploaded resource
+        output_format : str, optional
+            one of 'votable', 'votable_plain', 'csv', 'json' or 'fits'
 
         Returns
         -------
         table : astropy Table
             Query result
         """
-        r = self._post_query(query, name=name, upload_resource=upload_resource,
-                             upload_table_name=upload_table_name)
-        #TODO parse response and return results
-        return r
+        r = self._post_query(
+            query, name=name, upload_resource=upload_resource,
+            upload_table_name=upload_table_name, output_format=output_format)
+        #TODO: may add option for astropy table
+        return pd.read_csv(io.StringIO(r.text))
 
     def query_async(self, query, name=None,
-                         output_format="votable",
-                         upload_resource=None, upload_table_name=None,
-                         autorun=True):
+                    upload_resource=None, upload_table_name=None,
+                    output_format="votable",
+                    autorun=True):
         """
         Do asynchronous query to server
 
@@ -182,16 +183,13 @@ class Tap(object):
         ----------
         query : str, mandatory
             query to be executed
-        output_file : str, optional, default None
-            file name where the results are saved if dumpToFile is True.
-            If this parameter is not provided, the jobid is used instead
-        output_format : str, optional, default 'votable'
-            results format
         upload_resource: str, optional, default None
             resource to be uploaded to UPLOAD_SCHEMA
         upload_table_name: str, required if upload_resource is
             provided, default None
             resource temporary table name associated to the uploaded resource
+        output_format : str, optional, default 'votable'
+            results format
         autorun: boolean, optional, default True
             if 'True', sets 'phase' parameter to 'RUN',
             so the framework can start the job.
@@ -201,7 +199,10 @@ class Tap(object):
         job : 
             blah
         """
-        r = self._post_query(query, name=name, async_=True)
+        r = self._post_query(
+            query, name=name, upload_resource=upload_resource,
+            upload_table_name=upload_table_name, output_format=output_format,
+            async_=True)
         # TODO: parse response and return Job
         return r
 
@@ -320,26 +321,29 @@ class GaiaTapPlus(Tap):
     def baseurl(self):
         return '{s.protocol:s}://{s.host:s}/{s.server_context:s}'.format(s=self)
 
-    def load_tables(self, only_tables=False, include_shared_tables=False):
+    def get_table_info(self, tables=None, only_tables=False, share_accessible=False):
         """
         Load all accessible tables
 
         Parameters
         ----------
-        only_tables : bool, TAP+ only, optional, default 'False'
-            True to load table names only
-        include_shared_tables : bool, TAP+, optional, default 'False'
+        tables : str
+            comma-separated name of schema.tables to query
+        only_tables : bool
+            True to get table names only
+        share_accessible : bool
             True to include shared tables
 
         Returns
         -------
-        tables : 
-            stuff
+        tables : TableSet 
+            list of tables
         """
         url = "{s.tap_endpoint}/tables".format(s=self)
         logger.debug("tables url = {:s}".format(url))
 
         payload = dict(
+            tables=tables,
             only_tables=only_tables,
             share_accessible=True if include_shared_tables else False
         )
