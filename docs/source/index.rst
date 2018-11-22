@@ -11,6 +11,15 @@ Welcome to gapipes's documentation!
    :caption: Contents:
 
 
+gaia
+----
+
+.. autoclass:: gapipes.gaia.core.Tap
+    :members:
+
+.. autoclass:: gapipes.gaia.core.GaiaTapPlus
+    :members:
+
 
 Indices and tables
 ==================

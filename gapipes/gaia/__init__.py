@@ -1,3 +1,3 @@
-from .core import GaiaTapPlus
+from .core import Tap, GaiaTapPlus
 
-__all__ = []
+__all__ = ['Tap', 'GaiaTapPlus']

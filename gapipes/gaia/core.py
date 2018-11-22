@@ -25,7 +25,8 @@ class Tap(object):
     _tables = None
 
     def __init__(self, host, path, protocol='http', port=80):
-        """Constructor
+        """
+        Create TAP Service
 
         Parameters
         ----------
@@ -55,18 +56,18 @@ class Tap(object):
         """
         Parse vod:tableset XML and return a list of tables
         
-        Returns TODO
+        Returns
+        -------
+        tableset : TableSet
+            list of tables
         """
         return utils.parse_tableset(xml)
 
     # TODO: actually found this to return private tables, too when logged in.
     @property
     def tables(self):
-        """Loads all public tables
-
-        Returns
-        -------
-        A list of table objects
+        """
+        List of available tables
         """
         if self._tables is None:
             response = self.session.get("{s.tap_endpoint}/tables".format(s=self))
@@ -155,7 +156,8 @@ class Tap(object):
                          output_format="votable",
                          upload_resource=None, upload_table_name=None,
                          autorun=True):
-        """Launches an asynchronous job
+        """
+        Do asynchronous query to server
 
         Parameters
         ----------
@@ -166,13 +168,6 @@ class Tap(object):
             If this parameter is not provided, the jobid is used instead
         output_format : str, optional, default 'votable'
             results format
-        verbose : bool, optional, default 'False'
-            flag to display information about the process
-        dump_to_file : bool, optional, default 'False'
-            if True, the results are saved in a file instead of using memory
-        background : bool, optional, default 'False'
-            when the job is executed in asynchronous mode, this flag specifies
-            whether the execution will wait until results are available
         upload_resource: str, optional, default None
             resource to be uploaded to UPLOAD_SCHEMA
         upload_table_name: str, required if upload_resource is
@@ -184,7 +179,8 @@ class Tap(object):
 
         Returns
         -------
-        A Job object
+        job : 
+            blah
         """
         r = self._post_query(query, name=name, async_=True)
         # TODO: parse response and return Job
@@ -320,7 +316,8 @@ class GaiaTapPlus(Tap):
 
         Returns
         -------
-        A list of table objects
+        tables : 
+            stuff
         """
         url = "{s.tap_endpoint}/tables".format(s=self)
         logger.debug("tables url = {:s}".format(url))

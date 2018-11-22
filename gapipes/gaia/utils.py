@@ -11,7 +11,10 @@ from astropy.table import Table
 
 __all__ = [
     'parse_html_response_error',
-    'parse_tableset'
+    'parse_tableset',
+    'ColumnMeta',
+    'TableMeta',
+    'TableSet'
 ]
 
 # NOTE: Unique name spaces in all xml files in tests/data

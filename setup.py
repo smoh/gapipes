@@ -27,7 +27,8 @@ setup(
 
     packages=find_packages(exclude=('tests',)),
 
-    install_requires=[],
+    install_requires=[
+        'pandas>=0.23'],
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
