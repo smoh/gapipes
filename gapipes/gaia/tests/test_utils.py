@@ -2,7 +2,7 @@ import os
 import pytest
 from functools import partial
 
-from astroquery.gaia import utils
+from gapipes.gaia import utils
 
 
 def data_path(filename):

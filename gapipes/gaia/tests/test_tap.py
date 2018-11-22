@@ -1,7 +1,4 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
-
-from astroquery.utils.testing_tools import MockResponse
-from astroquery.gaia.core import Tap
+from gapipes.gaia.core import Tap
 
 
 class TestTap(object):
