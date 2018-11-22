@@ -1,20 +1,3 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""
-=============
-TAP plus
-=============
-
-@author: Juan Carlos Segovia
-@contact: juan.carlos.segovia@sciops.esa.int
-
-European Space Astronomy Centre (ESAC)
-European Space Agency (ESA)
-
-Created on 30 jun. 2016
-
-
-"""
-
 import re
 
 TAP_UTILS_QUERY_TOP_PATTERN = re.compile(
@@ -110,40 +93,3 @@ def parse_http_votable_response_error(responseStr, status):
 
 
 
-
-def get_schema_name(full_qualified_table_name):
-    """Extracts the schema name form a full qualified table name.
-
-    Parameters
-    ----------
-    full_qualified_table_name : str, mandatory
-        A full qualified table name (i.e. schema name and table name)
-
-    Returns
-    -------
-    The schema name or None.
-    """
-    pos = full_qualified_table_name.rfind('.')
-    if pos == -1:
-        return None
-    name = full_qualified_table_name[0:pos]
-    return name
-
-
-def get_table_name(full_qualified_table_name):
-    """Extracts the table name form a full qualified table name.
-
-    Parameters
-    ----------
-    full_qualified_table_name : str, mandatory
-        A full qualified table name (i.e. schema name and table name)
-
-    Returns
-    -------
-    The table name or None.
-    """
-    pos = full_qualified_table_name.rfind('.')
-    if pos == -1:
-        return full_qualified_table_name
-    name = full_qualified_table_name[pos+1:]
-    return name
