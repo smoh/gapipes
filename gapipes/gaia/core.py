@@ -53,8 +53,12 @@ class Tap(object):
     
     @staticmethod
     def parse_tableset(xml):
-        """
-        Parse vod:tableset XML and return a list of tables
+        """Parse vod:tableset XML and return a list of tables
+
+        Parameters
+        ----------
+        xml : str
+            XML string to be parsed
         
         Returns
         -------
@@ -89,7 +93,7 @@ class Tap(object):
             query to be executed
         async_ : bool
             send asynchronous query if True
-        upload_resource: str, optional, default None
+        upload_resource: str, optional
             resource to be uploaded to UPLOAD_SCHEMA
         upload_table_name: str, required if upload_resource is
             provided, default None
@@ -98,6 +102,7 @@ class Tap(object):
         Returns
         -------
         response : requests.Response
+            response
         """
         # TODO: docstring is missing what other output_format is available.
         query = taputils.set_top_in_query(query, 2000)
@@ -146,6 +151,23 @@ class Tap(object):
     def query(self, query, name=None, upload_resource=None, upload_table_name=None):
         """
         Synchronous query to TAP server
+
+        Parameters
+        ----------
+        query : str
+            query to be executed
+        name : str, optional
+            job name
+        upload_resource: str, optional
+            resource to be uploaded to UPLOAD_SCHEMA
+        upload_table_name: str, required if upload_resource is
+            provided, default None
+            resource temporary table name associated to the uploaded resource
+
+        Returns
+        -------
+        table : astropy Table
+            Query result
         """
         r = self._post_query(query, name=name, upload_resource=upload_resource,
                              upload_table_name=upload_table_name)
@@ -409,19 +431,15 @@ class GaiaTapPlus(Tap):
         r = self.session.post(url, data=args, files=files)
         return r
 
-    def delete_user_table(self, table_name, force_removal=False,
-                          verbose=False):
-        """
-        Remove a user table
+    def delete_user_table(self, table_name, force_removal=False):
+        """Delete a user table
 
         Parameters
         ----------
         table_name: str
             table to be removed
-        force_removal : bool, optional, default 'False'
+        force_removal : bool, optional
             flag to indicate if removal should be forced
-        verbose : bool, optional, default 'False'
-            flag to display information about the process
         """
         url = "{s.baseurl:s}/{s.upload_context}".format(s=self)
 
