@@ -1,13 +1,16 @@
 """
 Utilities for parsing Tap and Gaia TapPlus HTML and XML responses
 """
-
+import logging
 import re
 from functools import partial
 from collections import namedtuple
+import requests
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 from astropy.table import Table
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     'parse_html_response_error',
@@ -86,8 +89,8 @@ class TableMeta(
                      names=['name', 'datatype', 'unit', 'short_description'])
     
     def __repr__(self):
-        return "{name:s}, {ncolumns:d} columns".format(
-                   name=self.name, ncolumns=len(self.columns))
+        return "{schema:s}.{name:s}, {ncolumns:d} columns".format(
+            schema=self.schema, name=self.name, ncolumns=len(self.columns))
 
 
 class TableSet(list):
@@ -170,6 +173,7 @@ def parse_tableset(xml):
 
 class Job(object):
     """Job on TAP server
+
     """
     _lookup = {
         "jobid":            "uws:jobId",
@@ -187,31 +191,54 @@ class Job(object):
     }
 
     def __init__(self):
-        pass
+        self.session = None
+        self.url = None
+        self.result_url = None
     
     @classmethod
-    def from_xml(cls, xml):
+    def from_response(cls, response):
         """
         Create Job from response of TAP server
+
+        Parameters
+        ----------
+        response : requests.Response
+            response from POST to /async
         """
-        root = ET.fromstring(xml)
         job = cls()
-        for k, v in Job._lookup.items():
-            print(k)
-            setattr(job, k, root.find(v, ns).text)
+
+        logger.debug('Try to get job location from redirect header')
+        job.url = response.history[0].headers['Location']
+        logger.debug(job.url)
+        logger.debug(response.url)
         
-        job.query = root.find(".//uws:parameter[@id='query']", ns).text
+        assert response.headers['Content-Type'] == 'text/xml;charset=UTF-8'
 
-        result = root.find('.//uws:results//uws:result', ns)
-        job.result_url = result.attrib['{{{xlink}}}href'.format(**ns)]
-
-        #NOTE: Job location is in the header of redirect response
-        # job.url = r.history[0].headers['Location']
-        # This can be inferred from result_url as resut_url is [job location]/resuts/result
-        job.url = job.result_url.rstrip('/results/result')
-
+        parsed = Job.parse_xml(response.text)
+        for k, v in parsed.items():
+            setattr(job, k, v)
         return job
     
+    @staticmethod
+    def parse_xml(xml):
+        out = {}
+        root = ET.fromstring(xml)
+        for k, v in Job._lookup.items():
+            out[k] = root.find(v, ns).text
+        
+        out['query'] = root.find(".//uws:parameter[@id='query']", ns).text
+        logger.debug('Current phase: {0}'.format(out['phase']))
+    
+        if out['phase'] == 'COMPLETED':
+            result = root.find('.//uws:results//uws:result', ns)
+            out['result_url'] = result.attrib['{{{xlink}}}href'.format(**ns)]
+        return out
+        
     @classmethod
-    def from_url(cls):
-        pass
+    def from_xml(cls, xml):
+        job = cls()
+        parsed = Job.parse_xml(xml)
+        for k, v in parsed.items():
+            setattr(job, k, v)
+        return job
+    

@@ -44,4 +44,5 @@ class TestJob(object):
         assert job.phase == 'COMPLETED'
         assert job.ownerid == 'anonymous'
         assert job.result_url == "http://gea.esac.esa.int/tap-server/tap/async/1542458555634O/results/result"
-        assert job.url == "http://gea.esac.esa.int/tap-server/tap/async/1542458555634O"
+        assert job.url is None
+        assert job.session is None

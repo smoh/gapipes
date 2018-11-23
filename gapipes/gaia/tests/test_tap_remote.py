@@ -25,9 +25,11 @@ def test_query_with_upload(gaiatap):
 
 def test_query_async(gaiatap):
     query = 'select top 5 * from gaiadr1.tgas_source;'
-    r = gaiatap.query(query)
+    j = gaiatap.query_async(query)
+    assert j.query == query
 
 def test_query_async_with_upload(gaiatap):
     query = 'select top 5 * from TAP_UPLOAD.mytable;'
     mytable = Table({'a':[1,2,3], 'b':[4,5,6]})
-    r = gaiatap.query(query, upload_resource=mytable, upload_table_name='mytable')
+    j = gaiatap.query_async(query, upload_resource=mytable, upload_table_name='mytable')
+    assert j.query == query

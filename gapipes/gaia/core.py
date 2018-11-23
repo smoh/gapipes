@@ -12,6 +12,7 @@ from astropy import units
 from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
 from . import utils
+from .utils import Job
 
 
 logger = logging.getLogger(__name__)
@@ -163,6 +164,7 @@ class Tap(object):
 
         Returns
         -------
+        #TODO
         table : astropy Table
             Query result
         """
@@ -199,12 +201,13 @@ class Tap(object):
         job : 
             blah
         """
+        #NOTE: The first response is 303 redirect to Job location
+        # Job location is in the header of redirect response
         r = self._post_query(
             query, name=name, upload_resource=upload_resource,
             upload_table_name=upload_table_name, output_format=output_format,
             async_=True)
-        # TODO: parse response and return Job
-        return r
+        return Job.from_response(r)
 
     @classmethod
     def from_url(cls, url):
