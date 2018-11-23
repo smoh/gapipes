@@ -35,3 +35,13 @@ def test_parse_tableset():
     assert all(list(map(lambda x: x.name, gaia_source_tables)))
     assert len(gaia_source_tables) == 2
 
+
+class TestJob(object):
+    def test_job(self):
+        with open(data_path('top5gaia_async.xml'), 'r') as f:
+            job = utils.Job.from_xml(f.read())
+        assert job.jobid == '1542458555634O'
+        assert job.phase == 'COMPLETED'
+        assert job.ownerid == 'anonymous'
+        assert job.result_url == "http://gea.esac.esa.int/tap-server/tap/async/1542458555634O/results/result"
+        assert job.url == "http://gea.esac.esa.int/tap-server/tap/async/1542458555634O"

@@ -25,6 +25,14 @@ __all__ = [
 # xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/UWS/v1.0 http://www.ivoa.net/xml/UWS/v1.0"  total="1">
 # xmlns:vod="http://www.ivoa.net/xml/VODataService/v1.1" xsi:type="vod:TableSet"
 # xmlns:esatapplus="http://esa.int/xml/EsaTapPlus" xsi:schemaLocation="http://www.ivoa.net/xml/VODataService/v1.1 http://www.ivoa.net/xml/VODataService/v1.1 http://esa.int/xml/EsaTapPlus http://gea.esac.esa.int/tap-server/xml/esaTapPlusAttributes.xsd">
+ns = {
+    'uws': "http://www.ivoa.net/xml/UWS/v1.0",
+    'xlink': "http://www.w3.org/1999/xlink",
+    'xs': "http://www.w3.org/2001/XMLSchema",
+    'xsi': "http://www.w3.org/2001/XMLSchema-instance",
+    'vod': "http://www.ivoa.net/xml/VODataService/v1.1", 
+    'esatapplus': "http://esa.int/xml/EsaTapPlus"
+}
 
 
 def xstr(s):
@@ -159,24 +167,10 @@ def parse_tableset(xml):
     return TableSet(tables)
 
 
-ns = {'uws': "http://www.ivoa.net/xml/UWS/v1.0",
-      'xlink': "http://www.w3.org/1999/xlink"}
-
-items = [
-    "uws:jobId",
-    "uws:runId",
-    "uws:ownerId",
-    "uws:phase",
-    "uws:quote",
-    "uws:startTime",
-    "uws:endTime",
-    "uws:executionDuration",
-    "uws:destruction",
-    "uws:creationTime",
-    "uws:locationId",
-    "uws:name"]
-
-lookup = {
+class Job(object):
+    """Job on TAP server
+    """
+    _lookup = {
         "jobid":            "uws:jobId",
         "runid":            "uws:runId",
         "ownerid":          "uws:ownerId",
@@ -189,25 +183,34 @@ lookup = {
         "creationtime":     "uws:creationTime",
         "locationid":       "uws:locationId",
         "name":             "uws:name",
-}
+    }
 
-
-
-
-class Job(object):
     def __init__(self):
         pass
+    
+    @classmethod
+    def from_xml(cls, xml):
+        """
+        Create Job from response of TAP server
+        """
+        root = ET.fromstring(xml)
+        job = cls()
+        for k, v in Job._lookup.items():
+            print(k)
+            setattr(job, k, root.find(v, ns).text)
+        
+        job.query = root.find(".//uws:parameter[@id='query']", ns).text
 
+        result = root.find('.//uws:results//uws:result', ns)
+        job.result_url = result.attrib['{{{xlink}}}href'.format(**ns)]
 
-def test_parse_job():
-    tree = ET.parse('../../top5gaia_async.xml')
-    root = tree.getroot()
+        #NOTE: Job location is in the header of redirect response
+        # job.url = r.history[0].headers['Location']
+        # This can be inferred from result_url as resut_url is [job location]/resuts/result
+        job.url = job.result_url.rstrip('/results/result')
 
-    job = Job()
-    for k, v in lookup.items():
-        print(k)
-        setattr(job, k, root.find(v, ns).text)
-
-    result_urls = [r.attrib['{{{xlink}}}href'.format(**ns)]
-            for r in root.findall('.//uws:results//uws:result', ns)]
-
+        return job
+    
+    @classmethod
+    def from_url(cls):
+        pass
