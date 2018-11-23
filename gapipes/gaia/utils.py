@@ -15,6 +15,7 @@ __all__ = [
     'ColumnMeta',
     'TableMeta',
     'TableSet'
+    'Job'
 ]
 
 # NOTE: Unique name spaces in all xml files in tests/data
