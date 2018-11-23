@@ -12,7 +12,7 @@ from astropy import units
 from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
 from . import utils
-from .utils import Job
+from .utils import Job, parse_html_response_error
 
 
 logger = logging.getLogger(__name__)
@@ -210,7 +210,7 @@ class Tap(object):
         return Job.from_response(r)
 
     @classmethod
-    def from_url(cls, url):
+    def from_url(cls, url, **kwargs):
         """
         Make a Tap from url [http(s)://]host[:port][/path]
         """
@@ -224,7 +224,7 @@ class Tap(object):
         if not port:
             port = default_port[protocol]
         path = parsed_url.path
-        return cls(host, path, protocol=protocol, port=port)
+        return cls(host, path, protocol=protocol, port=port, **kwargs)
 
     def __repr__(self):
         return '{cls:s}("{s.host:s}", "{s.path:s}", "{s.protocol:s}", {s.port:d})'\
@@ -358,31 +358,6 @@ class GaiaTapPlus(Tap):
             tsp.parseData(io.BytesIO(r.content))
         return tsp.get_tables()
 
-    def load_table(self, table):
-        """Loads the specified table
-
-        Parameters
-        ----------
-        table : str, mandatory
-            full qualified table name (i.e. schema name + table name)
-
-        Returns
-        -------
-        A table object
-        """
-        url = "{s.tap_endpoint:s}/tables?tables={table:s}".format(
-            s=self, table=table)
-        response = self.session.get(url)
-        try:
-            response.raise_for_status()
-            tsp = TableSaxParser()
-            tsp.parseData(io.BytesIO(response.content))
-            return tsp.get_table()
-        except HTTPError as e:
-            useful_error_message = parse_html_response_error(response.text)
-            e.message += '\n' + useful_error_message
-            raise e
-
     def upload_table(self, upload_resource, table_name,
                      table_description="",
                      format='votable'):
@@ -455,6 +430,8 @@ class GaiaTapPlus(Tap):
         r = self.session.post(url, data=args)
         if not r.raise_for_status():
             return r
+
+
 
 # class GaiaClass(TapPlus):
 

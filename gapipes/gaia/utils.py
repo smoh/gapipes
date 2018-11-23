@@ -191,7 +191,6 @@ class Job(object):
     }
 
     def __init__(self):
-        self.session = None
         self.url = None
         self.result_url = None
     
@@ -241,4 +240,9 @@ class Job(object):
         for k, v in parsed.items():
             setattr(job, k, v)
         return job
-    
+
+
+class TapPlusJob(Job):
+
+    def __init__(self):
+        pass
