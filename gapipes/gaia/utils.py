@@ -220,6 +220,8 @@ class Job(object):
     
     @staticmethod
     def parse_xml(xml):
+        """Parse XML response from an async TAP job
+        """
         out = {}
         root = ET.fromstring(xml)
         for k, v in Job._lookup.items():

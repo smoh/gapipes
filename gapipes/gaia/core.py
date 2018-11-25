@@ -326,7 +326,7 @@ class GaiaTapPlus(Tap):
 
     def get_table_info(self, tables=None, only_tables=False, share_accessible=False):
         """
-        Load all accessible tables
+        Get table metadata for accessible tables
 
         Parameters
         ----------
@@ -348,15 +348,14 @@ class GaiaTapPlus(Tap):
         payload = dict(
             tables=tables,
             only_tables=only_tables,
-            share_accessible=True if include_shared_tables else False
+            share_accessible=True if share_accessible else False
         )
         r = self.session.get(url, params=payload)
 
         if not r.raise_for_status():
-            tsp = TableSaxParser()
-            # TODO: this is a stopgap
-            tsp.parseData(io.BytesIO(r.content))
-        return tsp.get_tables()
+            tables = self.parse_tableset(r.text)
+            self._tables = tables
+            return tables
 
     def upload_table(self, upload_resource, table_name,
                      table_description="",
@@ -376,8 +375,6 @@ class GaiaTapPlus(Tap):
             resource format
             Available formats: 'VOTable', 'CSV' and 'ASCII'
         """
-        # TODO: available froamts from http://gea.esac.esa.int/archive-help/index.html
-        #       where else is TapPlus applicable?
         url = "{s.baseurl:s}/{s.upload_context}".format(s=self)
         # url = "https://gea.esac.esa.int/tap-server/Upload"
         logger.debug("upload_table url = {:s}".format(url))
