@@ -174,6 +174,9 @@ def parse_tableset(xml):
 class Job(object):
     """Job on TAP server
 
+    Attributes
+    ----------
+    # TODO
     """
     _lookup = {
         "jobid":            "uws:jobId",
@@ -190,9 +193,16 @@ class Job(object):
         "name":             "uws:name",
     }
 
-    def __init__(self):
-        self.url = None
-        self.result_url = None
+    def __init__(self, *args, **kwargs):
+
+        self.jobid = kwargs.pop('jobid', None)
+        self.runid = kwargs.pop('runid', None)
+        self.ownerid = kwargs.popt('ownerid', None)
+        self.url = kwargs.pop('url', None)
+        self.result_url = kwargs.pop('result_url', None)
+        
+        #NOTE: possible phases are PENDING, COMPLETED, ABORTED, ERROR
+        self._phase = kwargs.pop('phase', None)
     
     @classmethod
     def from_response(cls, response):
@@ -204,19 +214,15 @@ class Job(object):
         response : requests.Response
             response from POST to /async
         """
-        job = cls()
-
         logger.debug('Try to get job location from redirect header')
-        job.url = response.history[0].headers['Location']
-        logger.debug(job.url)
+        url = response.history[0].headers['Location']
+        logger.debug(url)
         logger.debug(response.url)
         
         assert response.headers['Content-Type'] == 'text/xml;charset=UTF-8'
 
         parsed = Job.parse_xml(response.text)
-        for k, v in parsed.items():
-            setattr(job, k, v)
-        return job
+        return cls(url=url, **parsed)
     
     @staticmethod
     def parse_xml(xml):
@@ -237,14 +243,34 @@ class Job(object):
         
     @classmethod
     def from_xml(cls, xml):
-        job = cls()
         parsed = Job.parse_xml(xml)
-        for k, v in parsed.items():
-            setattr(job, k, v)
-        return job
+        return cls(**parsed)
+    
+    @property
+    def phase(self):
+        """Current status of the job"""
+        if self.url is None:
+            raise TypeError("Job url is not found")
+        else:
+            if self._phase is 'COMPLETED':
+                return self._phase
+            else:
+                r = requests.get(self.url)
+                try:
+                    r.raise_for_status()
+                    self._phase = Job.parse_xml(r.text)['phase']
+                    return self._phase
+                except requests.exceptions.HTTPError as e:
+                    # TODO: some useful message
+                    raise e
+    
+    def get_result(self):
+        #TODO: this should be cached
+        pass
 
 
 class TapPlusJob(Job):
+    # TODO: add session to Job for authenticated access: at Job class?
 
     def __init__(self):
         pass
