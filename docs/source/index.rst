@@ -6,19 +6,19 @@
 Welcome to gapipes's documentation!
 ===================================
 
+Python interface to Gaia TAP+ and DataLink Service
+--------------------------------------------------
+
+* `Getting started <getting-started.html>`_
+
+Pandas pipelines to process Gaia DataFrames
+-------------------------------------------
+
+* some linkes
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-
-gaia
-----
-
-.. autoclass:: gapipes.gaia.core.Tap
-    :members:
-
-.. autoclass:: gapipes.gaia.core.GaiaTapPlus
-    :members:
 
 
 Indices and tables
