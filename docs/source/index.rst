@@ -3,27 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to gapipes's documentation!
-===================================
+Welcome to gapipes!
+===================
 
-Python interface to Gaia TAP+ and DataLink Service
---------------------------------------------------
+**gapipes** is a collection of routines to fetch and work with `Gaia <#>`_ data.
+
+It provides
+
+- interface to `Gaia TAP+ <#>`_ and `DataLink Service <#>`_
+- pandas `pipes <#>`_ to process Gaia DataFrames.
+
 
 * `Getting started <getting-started.html>`_
 
-Pandas pipelines to process Gaia DataFrames
--------------------------------------------
-
-* some linkes
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
