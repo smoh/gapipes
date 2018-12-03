@@ -3,6 +3,7 @@ Utilities for parsing Tap and Gaia TapPlus HTML and XML responses
 """
 import logging
 import re
+import time
 from functools import partial
 from collections import namedtuple
 import requests
@@ -197,15 +198,25 @@ class Job(object):
 
         self.jobid = kwargs.pop('jobid', None)
         self.runid = kwargs.pop('runid', None)
-        self.ownerid = kwargs.popt('ownerid', None)
+        self.ownerid = kwargs.pop('ownerid', None)
         self.url = kwargs.pop('url', None)
         self.result_url = kwargs.pop('result_url', None)
+
+        session = kwargs.pop('session', None)
+        if session is None:
+            self.session = requests.session()
+        else:
+            self.session = session
         
-        #NOTE: possible phases are PENDING, COMPLETED, ABORTED, ERROR
+        #NOTE: possible phases are EXECUTING, PENDING, COMPLETED, ABORTED, ERROR
         self._phase = kwargs.pop('phase', None)
     
+    def __repr__(self):
+        s = "Job(jobid='{s.jobid}', phase='{s.phase}')".format(s=self)
+        return s
+    
     @classmethod
-    def from_response(cls, response):
+    def from_response(cls, response, session=None):
         """
         Create Job from response of TAP server
 
@@ -222,7 +233,7 @@ class Job(object):
         assert response.headers['Content-Type'] == 'text/xml;charset=UTF-8'
 
         parsed = Job.parse_xml(response.text)
-        return cls(url=url, **parsed)
+        return cls(url=url, session=session, **parsed)
     
     @staticmethod
     def parse_xml(xml):
@@ -234,17 +245,13 @@ class Job(object):
             out[k] = root.find(v, ns).text
         
         out['query'] = root.find(".//uws:parameter[@id='query']", ns).text
+        out['format'] = root.find(".//uws:parameter[@id='format']", ns).text
         logger.debug('Current phase: {0}'.format(out['phase']))
     
         if out['phase'] == 'COMPLETED':
             result = root.find('.//uws:results//uws:result', ns)
             out['result_url'] = result.attrib['{{{xlink}}}href'.format(**ns)]
         return out
-        
-    @classmethod
-    def from_xml(cls, xml):
-        parsed = Job.parse_xml(xml)
-        return cls(**parsed)
     
     @property
     def phase(self):
@@ -252,22 +259,52 @@ class Job(object):
         if self.url is None:
             raise TypeError("Job url is not found")
         else:
-            if self._phase is 'COMPLETED':
-                return self._phase
-            else:
-                r = requests.get(self.url)
+            if self._phase is None or self._phase == 'EXECUTING':
+                r = self.session.get(self.url)
                 try:
                     r.raise_for_status()
-                    self._phase = Job.parse_xml(r.text)['phase']
+                    parsed = Job.parse_xml(r.text)
+                    self._phase = parsed['phase']
+                    if parsed['phase'] == 'COMPLETED':
+                        self.result_url = parsed['result_url']
                     return self._phase
                 except requests.exceptions.HTTPError as e:
                     # TODO: some useful message
                     raise e
+            else:
+                return self._phase
     
-    def get_result(self):
-        #TODO: this should be cached
-        pass
+    @property
+    def finished(self):
+        return self.phase == 'COMPLETED'
+    
+    #TODO: this should be cached
+    def get_result(self, sleep=0.5, wait=True):
+        """
+        Get the result or wait until ready
 
+        Parameters
+        ----------
+        sleep: float
+            Delay between status update for a given number of seconds
+        wait: bool
+            set to wait until result is ready
+
+        Returns
+        -------
+        table: Astropy.Table
+            votable result
+        """
+        # while (not self.finished) & wait:
+        #     time.sleep(sleep)
+        # if not self.finished:
+        #     return
+        # #Get results
+        # try:
+        #     r = self.session.get(self.result_url)
+        #     if r.ok:
+        return
+    
 
 class TapPlusJob(Job):
     # TODO: add session to Job for authenticated access: at Job class?

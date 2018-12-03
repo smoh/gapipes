@@ -27,14 +27,14 @@ class Tap(object):
 
     Parameters
     ----------
-    host : str, required
+    host : str
         host name
-    path : str, mandatory
+    path : str
         server context
-    protocol : str, optional
+    protocol : str
         access protocol, usually 'http' or 'https'
-    port : int, optional, default '80'
-        HTTP port
+    port : int
+        HTTP port; Default: 80 for http and 443 for https
     """
     _tables = None
 
@@ -66,8 +66,20 @@ class Tap(object):
             list of tables
         """
         return utils.parse_tableset(xml)
+    
+    @staticmethod
+    def parse_result_table(response, format):
+        """Parse and return the right table format
+        """
+        if format not in ['votable', 'csv', 'fits']:
+            raise ValueError('format is not recognized')
+        if format == 'csv':
+            return pd.read_csv(io.StringIO(response.text))
+        elif format == 'votable':
+            return Table.read(io.BytesIO(response.content), format='votable')
+        elif format == 'fits':
+            return Table.read(io.BytesIO(response.content), format='fits')
 
-    # TODO: actually found this to return private tables, too when logged in.
     @property
     def tables(self):
         """
@@ -106,7 +118,9 @@ class Tap(object):
         response : requests.Response
             response
         """
-        # TODO: docstring is missing what other output_format is available.
+        if 'select' not in query.lower():
+            with open(query, 'r') as f:
+                query = f.read()
         args = {
             "REQUEST": "doQuery",
             "LANG": "ADQL",
@@ -145,13 +159,12 @@ class Tap(object):
     
     def query(self, query, name=None, upload_resource=None, upload_table_name=None,
               output_format='csv'):
-        """
-        Synchronous query to TAP server
+        """Synchronous query to TAP server
 
         Parameters
         ----------
         query : str
-            query to be executed
+            query or path containing query
         name : str, optional
             job name
         upload_resource: str, optional
@@ -159,7 +172,7 @@ class Tap(object):
         upload_table_name: str, required if upload_resource is
             provided, default None
             resource temporary table name associated to the uploaded resource
-        output_format : str, optional
+        output_format : str
             one of 'votable', 'votable_plain', 'csv', 'json' or 'fits'
 
         Returns
@@ -171,8 +184,7 @@ class Tap(object):
         r = self._post_query(
             query, name=name, upload_resource=upload_resource,
             upload_table_name=upload_table_name, output_format=output_format)
-        #TODO: may add option for astropy table
-        return pd.read_csv(io.StringIO(r.text))
+        Tap.parse_result_table(r, output_format)
 
     def query_async(self, query, name=None,
                     upload_resource=None, upload_table_name=None,
@@ -198,8 +210,8 @@ class Tap(object):
 
         Returns
         -------
-        job : 
-            blah
+        job : Job instance 
+            use `job.get_result()` to retrieve query result
         """
         #NOTE: The first response is 303 redirect to Job location
         # Job location is in the header of redirect response
@@ -243,19 +255,9 @@ class GaiaTapPlus(Tap):
         server context
     upload_context : str, optional, default None
         upload context
-    table_edit_context : str, optional, default None
-        context for all actions to be performed over a existing table
-    data_context : str, optional, default None
-        data context
-    datalink_context : str, optional, default None
-        datalink context
-    verbose : bool, optional, default 'True'
-        flag to display information about the process
     """
     def __init__(self, host, path, protocol='http', port=80,
                  server_context=None, upload_context=None):
-                #  table_edit_context=None, data_context=None,
-                #  datalink_context=None):
 
         super(GaiaTapPlus, self).__init__(host, path, protocol=protocol, port=port)
 
@@ -266,9 +268,6 @@ class GaiaTapPlus(Tap):
 
         self.server_context = server_context
         self.upload_context = upload_context
-        # self.table_edit_context = table_edit_context
-        # self.data_context = data_context
-        # self.datalink_context = datalink_context
     
     def login(self, user=None, password=None, credentials_file=None,
               verbose=False):
