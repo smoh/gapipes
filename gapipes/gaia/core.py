@@ -1,14 +1,11 @@
-import os
 import io
 import logging
 import six
 import getpass
 import requests
-from requests.exceptions import HTTPError
 import pandas as pd
 
 from astropy.table import Table
-from astropy import units
 from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
 from . import utils
@@ -101,22 +98,7 @@ class Tap(object):
                     async_=False):
         """POST synchronous or asynchronos query to Tap server
 
-        Parameters
-        ----------
-        query : str
-            query to be executed
-        async_ : bool
-            send asynchronous query if True
-        upload_resource: str, optional
-            resource to be uploaded to UPLOAD_SCHEMA
-        upload_table_name: str, required if upload_resource is
-            provided, default None
-            resource temporary table name associated to the uploaded resource
-
-        Returns
-        -------
-        response : requests.Response
-            response
+        Returns unchecked requests.Response
         """
         if 'select' not in query.lower():
             with open(query, 'r') as f:
@@ -143,7 +125,12 @@ class Tap(object):
                                  "is uploaded")
             # UPLOAD should be '[table_name],param:form_key'
             args['UPLOAD'] = '{0:s},param:{0:s}'.format(upload_table_name)
-            if isinstance(upload_resource, Table):
+            if isinstance(upload_resource, pd.DataFrame):
+                with io.BytesIO() as f:
+                    Table.from_pandas(upload_resource).write(f, format='votable')
+                    f.seek(0)
+                    chunk = f.read()
+            elif isinstance(upload_resource, Table):
                 with io.BytesIO() as f:
                     upload_resource.write(f, format='votable')
                     f.seek(0)
@@ -154,10 +141,10 @@ class Tap(object):
             files = {upload_table_name: chunk}
             response = self.session.post(url, data=args, files=files)
 
-        if not response.raise_for_status():
-            return response
+        return response
     
-    def query(self, query, name=None, upload_resource=None, upload_table_name=None,
+    def query(self, query, name=None,
+              upload_resource=None, upload_table_name=None,
               output_format='csv'):
         """Synchronous query to TAP server
 
@@ -167,18 +154,16 @@ class Tap(object):
             query or path containing query
         name : str, optional
             job name
-        upload_resource: str, optional
-            resource to be uploaded to UPLOAD_SCHEMA
-        upload_table_name: str, required if upload_resource is
-            provided, default None
-            resource temporary table name associated to the uploaded resource
+        upload_resource: path to votable file or pandas.DataFrame or astropy.table.Table
+            table to upload
+        upload_table_name: str
+            upload table name
         output_format : str
             one of 'votable', 'votable_plain', 'csv', 'json' or 'fits'
 
         Returns
         -------
-        #TODO
-        table : astropy Table
+        table : pd.DataFrame or astropy.table.Table 
             Query result
         """
         r = self._post_query(
@@ -197,11 +182,10 @@ class Tap(object):
         ----------
         query : str, mandatory
             query to be executed
-        upload_resource: str, optional, default None
-            resource to be uploaded to UPLOAD_SCHEMA
-        upload_table_name: str, required if upload_resource is
-            provided, default None
-            resource temporary table name associated to the uploaded resource
+        upload_resource: path to votable file or pandas.DataFrame or astropy.table.Table
+            table to upload
+        upload_table_name: str
+            upload table name
         output_format : str, optional, default 'votable'
             results format
         autorun: boolean, optional, default True
