@@ -9,7 +9,7 @@ import astropy.units as u
 
 __all__ = [
     'pipe', 'calculate_vtan_error', 'add_vtan_errors', 'add_vtan',
-    'make_icrs', 'add_xv', 'add_a_g_error', 'add_gMag', 'flag_good_phot']
+    'make_icrs', 'add_x', 'add_xv', 'add_a_g_error', 'add_gMag', 'flag_good_phot']
 
 
 def pipe(func):
