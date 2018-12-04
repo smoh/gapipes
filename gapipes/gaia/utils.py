@@ -18,7 +18,7 @@ __all__ = [
     'parse_tableset',
     'ColumnMeta',
     'TableMeta',
-    'TableSet'
+    'TableSet',
     'Job'
 ]
 
@@ -103,7 +103,7 @@ class TableSet(list):
         """
         Filter tables by schema or table name
 
-        Paramters
+        Parameters
         ---------
         schema : str or list of str
             schemas to get

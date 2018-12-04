@@ -11,12 +11,20 @@ Welcome to gapipes!
 It provides
 
 - interface to `Gaia TAP+ <#>`_ and `DataLink Service <#>`_
-- pandas `pipes <#>`_ to process Gaia DataFrames.
+- `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pipe.html?highlight=pipes>`_ to process Gaia DataFrames quickly and easily.
 
+
+User guide
+----------
 
 * `Getting started <getting-started.html>`_
+* Using pandas pipes
 
+
+API
+---
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+
+   api

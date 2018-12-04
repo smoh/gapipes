@@ -20,6 +20,5 @@ help:
 
 gaia:
 	make clean
-	sphinx-apidoc -o source/ ../gapipes ../gapipes/gaia/model/* ../gapipes/gaia/tests/*
 	make html
 	open build/html/index.html
