@@ -16,3 +16,26 @@ class TestTap(object):
         assert tap.protocol == 'https', "Tap has a wrong protocol"
         assert tap.port == 443, "Tap has a wrong port"
     
+    # patch _post_query
+    def test_query(self):
+
+        # r = tap.query("select top 5 * from ",)
+        # r = tap.query("select top 5 * from ", output_format='votable')
+        # r = tap.query("select top 5 * from ", output_format='fits')
+
+        # with uploads
+        
+        # wrong queries
+
+        # queries that time out?
+        pass
+    
+    def test_query_async(self):
+
+        # simple query, job parsing
+        # simple query, output format
+
+        # long query, waiting jobs
+
+        # test job attributes
+        pass
