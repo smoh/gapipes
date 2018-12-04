@@ -73,6 +73,15 @@ def make_icrs(df, include_pm_rv=True):
 
 
 @pipe
+def add_x(df, frame, unit=u.pc):
+    """Add cartesian coordinates `x`, `y`, `z` of a given `frame`"""
+    df = df.copy()
+    c = make_icrs(df, include_pm_rv=False).transform_to(frame)
+    df['x'], df['y'], df['z'] = c.cartesian.xyz.to(unit).value
+    return df
+
+
+@pipe
 def add_xv(df, frame, unit=u.pc):
     """
     Add cartesian coordinates x, y, z, vx, vy, vz for a given `frame`
@@ -86,7 +95,7 @@ def add_xv(df, frame, unit=u.pc):
     """
     df = df.copy()
     c = make_icrs(df).transform_to(frame)
-    df['x'], df['y'], df['z'] = c.cartesian.xyz.to(u.pc).value
+    df['x'], df['y'], df['z'] = c.cartesian.xyz.to(unit).value
     df['vx'], df['vy'], df['vz'] = c.velocity.d_xyz.value
     return df
 
