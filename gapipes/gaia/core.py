@@ -169,7 +169,12 @@ class Tap(object):
         r = self._post_query(
             query, name=name, upload_resource=upload_resource,
             upload_table_name=upload_table_name, output_format=output_format)
-        Tap.parse_result_table(r, output_format)
+        try:
+            r.raise_for_status()
+            return Tap.parse_result_table(r, output_format)
+        except requests.exceptions.HTTPError as e:
+            #TODO return some useful mesage
+            raise e
 
     def query_async(self, query, name=None,
                     upload_resource=None, upload_table_name=None,
