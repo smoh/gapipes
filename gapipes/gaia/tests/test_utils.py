@@ -66,15 +66,3 @@ def test_job_error_message(stored_responses):
         "Cannot parse query 'select top 5 * from gg.gaia_source' for job"\
         " '1543935708674O': 1 unresolved identifiers: gaia_source "\
         "[l.1 c.21 - l.1 c.35] !"
-
-
-class TestJob(object):
-    def test_job(self):
-        with open(data_path('top5gaia_async.xml'), 'r') as f:
-            job = utils.Job.from_xml(f.read())
-        assert job.jobid == '1542458555634O'
-        assert job.phase == 'COMPLETED'
-        assert job.ownerid == 'anonymous'
-        assert job.result_url == "http://gea.esac.esa.int/tap-server/tap/async/1542458555634O/results/result"
-        assert job.url is None
-        assert job.session is None
