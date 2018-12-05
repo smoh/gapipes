@@ -14,7 +14,8 @@ from astropy.table import Table
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    'parse_html_response_error',
+    'parse_html_error_response',
+    'parse_votable_error_response',
     'parse_tableset',
     'ColumnMeta',
     'TableMeta',
@@ -36,7 +37,8 @@ ns = {
     'xs': "http://www.w3.org/2001/XMLSchema",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance",
     'vod': "http://www.ivoa.net/xml/VODataService/v1.1", 
-    'esatapplus': "http://esa.int/xml/EsaTapPlus"
+    'esatapplus': "http://esa.int/xml/EsaTapPlus",
+    'votable': 'http://www.ivoa.net/xml/VOTable/v1.2'
 }
 
 
@@ -44,14 +46,25 @@ def xstr(s):
     return '' if s is None else str(s)
 
 
-def parse_html_response_error(html):
+def parse_html_error_response(html):
     """Return a useful message from failed TAP request"""
     soup = BeautifulSoup(html, 'html.parser')
     # this is not robust at all....
     message_li = soup.find(string=re.compile('Message')).parent.parent
     return message_li.text
 
-    
+
+def parse_votable_error_response(response):
+    """Return a useful message from server when response is not OK"""
+    # elif 'votable' in response.headers['Content-Type'].lower():
+    # synchronous wrong query
+    # NOTE: although the response is VOTABLE, there is not table
+    # and it is not parsed with astropy votable
+    root = ET.fromstring(response.text)
+    message = root.find('.//votable:INFO[@name="QUERY_STATUS"]', ns).text
+    return message.strip()
+
+
 class ColumnMeta(
     namedtuple('ColumnMeta', ['name', 'unit', 'datatype', 'description'],
                defaults=['', '', '', ''])):
@@ -251,6 +264,12 @@ class Job(object):
         if out['phase'] == 'COMPLETED':
             result = root.find('.//uws:results//uws:result', ns)
             out['result_url'] = result.attrib['{{{xlink}}}href'.format(**ns)]
+        
+        has_error_message = root.find(".//uws:errorSummary/uws:message", ns)
+        if has_error_message is not None:
+            out['message'] = has_error_message.text
+        else:
+            out['message'] = None
         return out
     
     @property

@@ -9,7 +9,7 @@ from astropy.table import Table
 from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
 from . import utils
-from .utils import Job, parse_html_response_error
+from .utils import Job, parse_html_error_response, parse_votable_error_response
 
 
 logger = logging.getLogger(__name__)
@@ -208,7 +208,7 @@ class Tap(object):
             query, name=name, upload_resource=upload_resource,
             upload_table_name=upload_table_name, output_format=output_format,
             async_=True)
-        return Job.from_response(r)
+        return Job.from_response(r, session=self.session)
 
     @classmethod
     def from_url(cls, url, **kwargs):
