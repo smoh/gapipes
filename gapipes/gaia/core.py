@@ -1,3 +1,4 @@
+import warnings
 import io
 import logging
 import six
@@ -74,7 +75,10 @@ class Tap(object):
         if format == 'csv':
             return pd.read_csv(io.StringIO(response.text))
         elif format == 'votable':
-            return Table.read(io.BytesIO(response.content), format='votable')
+            # suppress warnings by default
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                return Table.read(io.BytesIO(response.content), format='votable')
         elif format == 'fits':
             return Table.read(io.BytesIO(response.content), format='fits')
 
