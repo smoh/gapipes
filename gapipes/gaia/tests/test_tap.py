@@ -6,6 +6,7 @@ import os
 import pandas as pd
 from astropy.table import Table
 from gapipes.gaia.core import Tap
+from gapipes.gaia.utils import Job
 
 @pytest.fixture
 def mock_post_query():
@@ -56,7 +57,6 @@ def test_query(tap, mock_post_query):
         # assert isinstance(r, Table), "Failed to parse fits result table"
         # assert kwargs['output_format'] == 'fits'
 
-        #TODO check message
         with pytest.raises(requests.exceptions.HTTPError):
             r = tap.query("sync_wrong_query")
 
@@ -71,6 +71,24 @@ def test_query(tap, mock_post_query):
 
 def test_query_async(tap):
 
+    with patch('gapipes.Tap._post_query', mock_post_query):
+
+        job = tap.query_async("async_query")
+        assert isinstance(job, Job), "Async query did not return a Job"
+        assert job.jobid is not None
+        assert job.url is not None
+        assert job.phase == 'COMPLETED'
+        assert job.result_url is not None
+
+
+
+        r = tap.query("sync_query_votable", output_format='votable')
+        args, kwargs = mock_post_query.call_args
+        assert isinstance(r, Table), "Failed to parse votable result table"
+        assert kwargs['output_format'] == 'votable'
+
+
+        # queries that time out?
     # simple query, job parsing
     # simple query, output format
 
