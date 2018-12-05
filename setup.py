@@ -30,7 +30,8 @@ setup(
     install_requires=[
         'pandas>=0.23',
         'requests',
-        'astropy>=3'],
+        'astropy>=3',
+        'beautifulsoup4>=4.6'],
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
