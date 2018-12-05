@@ -7,6 +7,7 @@ import time
 from functools import partial
 from collections import namedtuple
 import requests
+from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 from astropy.table import Table
@@ -186,7 +187,7 @@ def parse_tableset(xml):
 
 
 class Job(object):
-    """Job on TAP server
+    """Job on a TAP server
 
     Attributes
     ----------
@@ -223,20 +224,29 @@ class Job(object):
         
         #NOTE: possible phases are EXECUTING, PENDING, COMPLETED, ABORTED, ERROR
         self._phase = kwargs.pop('phase', None)
+
+        self.query = kwargs.pop('query', None)
+        self.output_format = kwargs.pop('format', None)
+        self.message = kwargs.pop('message', None)
     
     def __repr__(self):
+        #TODO: change when errored
         s = "Job(jobid='{s.jobid}', phase='{s.phase}')".format(s=self)
         return s
     
     @classmethod
     def from_response(cls, response, session=None):
         """
-        Create Job from response of TAP server
+        Create Job from response from a TAP server
 
         Parameters
         ----------
         response : requests.Response
             response from POST to /async
+        session : requests.Session
+            session object
+        
+        Returns Job instance
         """
         logger.debug('Try to get job location from redirect header')
         url = response.history[0].headers['Location']
@@ -314,15 +324,17 @@ class Job(object):
         table: Astropy.Table
             votable result
         """
-        # while (not self.finished) & wait:
-        #     time.sleep(sleep)
-        # if not self.finished:
-        #     return
-        # #Get results
-        # try:
-        #     r = self.session.get(self.result_url)
-        #     if r.ok:
-        return
+        while (not self.finished) & wait:
+            time.sleep(sleep)
+        if not self.finished:
+            return
+        # Get results
+        try:
+            r = self.session.get(self.result_url)
+            r.raise_for_status()
+            return Tap.parse_result_table(r, self.output_format)
+        except HTTPError as e:
+            raise e
     
 
 class TapPlusJob(Job):
