@@ -69,7 +69,7 @@ def test_query(tap, mock_post_query):
         # queries that time out?
 
 
-def test_query_async(tap):
+def test_query_async(tap, mock_post_query):
 
     with patch('gapipes.Tap._post_query', mock_post_query):
 
