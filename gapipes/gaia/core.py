@@ -3,6 +3,7 @@ import logging
 import six
 import getpass
 import requests
+from requests.exceptions import HTTPError
 import pandas as pd
 
 from astropy.table import Table
@@ -172,9 +173,9 @@ class Tap(object):
         try:
             r.raise_for_status()
             return Tap.parse_result_table(r, output_format)
-        except requests.exceptions.HTTPError as e:
-            #TODO return some useful mesage
-            raise e
+        except HTTPError as e:
+            message = parse_votable_error_response(r)
+            raise HTTPError(message) from e
 
     def query_async(self, query, name=None,
                     upload_resource=None, upload_table_name=None,
@@ -296,8 +297,12 @@ class GaiaTapPlus(Tap):
                 return
         url = "https://{s.host:s}/{s.server_context:s}/login".format(s=self)
         r = self.session.post(url, data={'username': user, 'password': password})
-        if not r.raise_for_status():
+        try:
+            r.raise_for_status()
             return
+        except HTTPError as e:
+            message = parse_html_error_response(r.text)
+            raise HTTPError(message) from e
     
     def logout(self):
         """
@@ -305,8 +310,12 @@ class GaiaTapPlus(Tap):
         """
         url = "https://{s.host:s}/{s.server_context:s}/logout".format(s=self)
         r = self.session.post(url)
-        if not r.raise_for_status():
+        try:
+            r.raise_for_status()
             return
+        except HTTPError as e:
+            message = parse_html_error_response(r.text)
+            raise HTTPError(message) from e
     
     @property
     def baseurl(self):
