@@ -28,14 +28,14 @@ setup(
     packages=find_packages(exclude=('tests',)),
 
     install_requires=[
-        'pandas>=0.23'],
+        'pandas>=0.23',
+        'requests',
+        'astropy>=3'],
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
