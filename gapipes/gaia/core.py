@@ -164,7 +164,7 @@ class Tap(object):
 
         Returns
         -------
-        table : pd.DataFrame or astropy.table.Table 
+        table : pd.DataFrame or astropy.table.Table
             Query result
         """
         r = self._post_query(
@@ -200,7 +200,7 @@ class Tap(object):
 
         Returns
         -------
-        job : Job instance 
+        job : Job instance
             use `job.get_result()` to retrieve query result
         """
         #NOTE: The first response is 303 redirect to Job location
@@ -259,8 +259,7 @@ class GaiaTapPlus(Tap):
         self.server_context = server_context
         self.upload_context = upload_context
     
-    def login(self, user=None, password=None, credentials_file=None,
-              verbose=False):
+    def login(self, user=None, password=None, credentials_file=None):
         """
         Login to TAP server
 
@@ -277,8 +276,6 @@ class GaiaTapPlus(Tap):
             user password
         credentials_file : str, default None
             file containing user and password in two lines
-        verbose : bool, optional, default 'False'
-            flag to display information about the process
         """
         if credentials_file is not None:
             # read file: get user & password
@@ -349,10 +346,14 @@ class GaiaTapPlus(Tap):
         )
         r = self.session.get(url, params=payload)
 
-        if not r.raise_for_status():
+        try:
+            r.raise_for_status()
             tables = self.parse_tableset(r.text)
             self._tables = tables
             return tables
+        except HTTPError as e:
+            message = parse_html_error_response(r.text)
+            raise HTTPError(message) from e
 
     def upload_table(self, upload_resource, table_name,
                      table_description="",
@@ -422,5 +423,9 @@ class GaiaTapPlus(Tap):
         }
 
         r = self.session.post(url, data=args)
-        if not r.raise_for_status():
-            return r
+        try:
+            r.raise_for_status()
+            return r.text.strip()
+        except HTTPError as e:
+            message = parse_html_error_response(r.text)
+            raise HTTPError(message) from e
