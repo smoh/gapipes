@@ -183,7 +183,7 @@ class Tap(object):
 
     def query_async(self, query, name=None,
                     upload_resource=None, upload_table_name=None,
-                    output_format="votable",
+                    output_format="csv",
                     autorun=True):
         """
         Do asynchronous query to server

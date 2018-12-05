@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uws:job xmlns:uws="http://www.ivoa.net/xml/UWS/v1.0" 
+    xmlns:xlink="http://www.w3.org/1999/xlink" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/UWS/v1.0 http://www.ivoa.net/xml/UWS/v1.0">
+    <uws:jobId><![CDATA[1542458555634O]]></uws:jobId>
+    <uws:runId xsi:nil="true"/>
+    <uws:ownerId><![CDATA[anonymous]]></uws:ownerId>
+    <uws:phase>COMPLETED</uws:phase>
+    <uws:quote>-1</uws:quote>
+    <uws:startTime>2018-11-17T13:42:35.646+0100</uws:startTime>
+    <uws:endTime>2018-11-17T13:42:35.673+0100</uws:endTime>
+    <uws:executionDuration>5400</uws:executionDuration>
+    <uws:destruction>2018-11-20T13:42:35.634+0100</uws:destruction>
+    <uws:creationTime>2018-11-17T13:42:35.634+0100</uws:creationTime>
+    <uws:locationId>anonymous/2018/11/17/1542458555634O</uws:locationId>
+    <uws:name xsi:nil="true"/>
+    <uws:parameters>
+        <uws:parameter id="caption" parameter_type="COMMON" parameter_data_type="String"><![CDATA[How to cite and acknowledge Gaia: http://gea.esac.esa.int/archive/documentation/credits.html]]></uws:parameter>
+        <uws:parameter id="format" parameter_type="COMMON" parameter_data_type="String"><![CDATA[votable]]></uws:parameter>
+        <uws:parameter id="lang" parameter_type="COMMON" parameter_data_type="String"><![CDATA[ADQL]]></uws:parameter>
+        <uws:parameter id="lib_sl_version" parameter_type="COMMON" parameter_data_type="String"><![CDATA[3.1]]></uws:parameter>
+        <uws:parameter id="lib_tap_version" parameter_type="COMMON" parameter_data_type="String"><![CDATA[3.1]]></uws:parameter>
+        <uws:parameter id="lib_uws_version" parameter_type="COMMON" parameter_data_type="String"><![CDATA[3.1]]></uws:parameter>
+        <uws:parameter id="phase" parameter_type="COMMON" parameter_data_type="String"><![CDATA[RUN]]></uws:parameter>
+        <uws:parameter id="query" parameter_type="COMMON" parameter_data_type="String"><![CDATA[select top 5 * from gaiadr2.gaia_source;]]></uws:parameter>
+        <uws:parameter id="request" parameter_type="COMMON" parameter_data_type="String"><![CDATA[doQuery]]></uws:parameter>
+        <uws:parameter id="tapclient" parameter_type="COMMON" parameter_data_type="String"><![CDATA[aqtappy-1.2.1]]></uws:parameter>
+    </uws:parameters>
+    <uws:results>
+        <uws:result id="result" xlink:type="simple" xlink:href="http://gea.esac.esa.int/tap-server/tap/async/1542458555634O/results/result" mime="application/x-votable+xml" encoding="gzip" size="4976" rows="5" />
+    </uws:results>
+    <uws:errorSummary xsi:nil="true"/>
+</uws:job>

@@ -1,6 +1,7 @@
 """
 Utilities for parsing Tap and Gaia TapPlus HTML and XML responses
 """
+import io
 import logging
 import re
 import time
@@ -11,6 +12,11 @@ from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 from astropy.table import Table
+import pandas as pd
+
+import warnings
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -332,7 +338,19 @@ class Job(object):
         try:
             r = self.session.get(self.result_url)
             r.raise_for_status()
-            return Tap.parse_result_table(r, self.output_format)
+
+            format_ = self.output_format
+            if format_ not in ['votable', 'csv', 'fits']:
+                raise ValueError('format is not recognized')
+            if format_ == 'csv':
+                return pd.read_csv(io.StringIO(r.text))
+            elif format_ == 'votable':
+                # suppress warnings by default
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    return Table.read(io.BytesIO(r.content), format='votable')
+            elif format_ == 'fits':
+                return Table.read(io.BytesIO(r.content), format='fits')
         except HTTPError as e:
             raise e
     
