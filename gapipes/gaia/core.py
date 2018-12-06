@@ -45,11 +45,11 @@ class Tap(object):
         self.session = requests.session()
 
         logger.debug('TAP: {:s}'.format(self.tap_endpoint))
-    
+
     @property
     def tap_endpoint(self):
         return urljoin("{s.protocol:s}://{s.host:s}".format(s=self), self.path)
-    
+
     @staticmethod
     def parse_tableset(xml):
         """Parse vod:tableset XML and return a list of tables
@@ -58,14 +58,14 @@ class Tap(object):
         ----------
         xml : str
             XML string to be parsed
-        
+
         Returns
         -------
         tableset : TableSet
             list of tables
         """
         return utils.parse_tableset(xml)
-    
+
     @staticmethod
     def parse_result_table(response, format):
         """Parse and return the right table format
@@ -121,7 +121,7 @@ class Tap(object):
             args['jobname'] = name
         url = self.tap_endpoint + ('/async' if async_ else '/sync')
         logger.debug(args)
-        
+
         if upload_resource is None:
             response = self.session.post(url, data=args)
         else:
@@ -147,7 +147,7 @@ class Tap(object):
             response = self.session.post(url, data=args, files=files)
 
         return response
-    
+
     def query(self, query, name=None,
               upload_resource=None, upload_table_name=None,
               output_format='csv'):
@@ -262,7 +262,7 @@ class GaiaTapPlus(Tap):
 
         self.server_context = server_context
         self.upload_context = upload_context
-    
+
     def login(self, user=None, password=None, credentials_file=None):
         """
         Login to TAP server
@@ -304,7 +304,7 @@ class GaiaTapPlus(Tap):
         except HTTPError as e:
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
-    
+
     def logout(self):
         """
         Logout from TAP server
@@ -317,7 +317,7 @@ class GaiaTapPlus(Tap):
         except HTTPError as e:
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
-    
+
     @property
     def baseurl(self):
         return '{s.protocol:s}://{s.host:s}/{s.server_context:s}'.format(s=self)
@@ -337,7 +337,7 @@ class GaiaTapPlus(Tap):
 
         Returns
         -------
-        tables : TableSet 
+        tables : TableSet
             list of tables
         """
         url = "{s.tap_endpoint}/tables".format(s=self)
