@@ -315,7 +315,7 @@ class GaiaTapPlus(Tap):
             r.raise_for_status()
             return
         except HTTPError as e:
-            message = parse_html_error_response(r.text)
+            message = "Logout failed: are you sure you were logged in?"
             raise HTTPError(message) from e
 
     @property
@@ -433,3 +433,6 @@ class GaiaTapPlus(Tap):
         except HTTPError as e:
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
+
+    def list_jobs(self, kind='sync', offset=0, limit=100):
+        #todo
