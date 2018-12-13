@@ -353,7 +353,6 @@ class GaiaTapPlus(Tap):
         try:
             r.raise_for_status()
             tables = self.parse_tableset(r.text)
-            self._tables = tables
             return tables
         except HTTPError as e:
             message = parse_html_error_response(r.text)
@@ -436,3 +435,4 @@ class GaiaTapPlus(Tap):
 
     def list_jobs(self, kind='sync', offset=0, limit=100):
         #todo
+        pass
