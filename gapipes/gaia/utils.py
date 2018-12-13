@@ -43,7 +43,7 @@ ns = {
     'xlink': "http://www.w3.org/1999/xlink",
     'xs': "http://www.w3.org/2001/XMLSchema",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance",
-    'vod': "http://www.ivoa.net/xml/VODataService/v1.1", 
+    'vod': "http://www.ivoa.net/xml/VODataService/v1.1",
     'esatapplus': "http://esa.int/xml/EsaTapPlus",
     'votable': 'http://www.ivoa.net/xml/VOTable/v1.2'
 }
@@ -88,7 +88,7 @@ class ColumnMeta(
         s += '"{desc}"'.format(desc=self.description[:remaining_length])
         s += "..." if len(self.description) > remaining_length else "" + ")"
         return s
-    
+
     def __str__(self):
         # Descriptions are printed in full when this class is printed.
         return "Column name: {s.name}\nunit: {s.unit}"\
@@ -105,10 +105,10 @@ class TableMeta(
     def as_table(self):
         rows = list(map(
             lambda c: (c.name, c.datatype, c.unit, c.description[:60]),
-            self.columns)) 
+            self.columns))
         return Table(rows=rows,
                      names=['name', 'datatype', 'unit', 'short_description'])
-    
+
     def __repr__(self):
         return "{schema:s}.{name:s}, {ncolumns:d} columns".format(
             schema=self.schema, name=self.name, ncolumns=len(self.columns))
@@ -118,7 +118,7 @@ class TableSet(list):
     """
     A list of TableMeta that supports filtering
     """
-    
+
     def filter(self, schema=None, table=None):
         """
         Filter tables by schema or table name
@@ -137,14 +137,14 @@ class TableSet(list):
         def check_table(table, t):
             return t.name in table
         filtered = self.copy()
-        if schema is not None: 
+        if schema is not None:
             schema = set([schema]) if isinstance(schema, str) else set(schema)
             filtered = list(filter(partial(check_schema, schema), filtered))
         if table is not None:
             table = set([table]) if isinstance(table, str) else set(table)
             filtered = list(filter(partial(check_table, table), filtered))
         return TableSet(filtered)
-        
+
 
 def parse_tableset(xml):
     """
@@ -154,7 +154,7 @@ def parse_tableset(xml):
     ----------
     xml : str
         XML string to be parsed
-    
+
     Returns
     -------
     tables : TableSet
@@ -227,19 +227,19 @@ class Job(object):
             self.session = requests.session()
         else:
             self.session = session
-        
+
         #NOTE: possible phases are EXECUTING, PENDING, COMPLETED, ABORTED, ERROR
         self._phase = kwargs.pop('phase', None)
 
         self.query = kwargs.pop('query', None)
         self.output_format = kwargs.pop('format', None)
         self.message = kwargs.pop('message', None)
-    
+
     def __repr__(self):
         #TODO: change when errored
         s = "Job(jobid='{s.jobid}', phase='{s.phase}')".format(s=self)
         return s
-    
+
     @classmethod
     def from_response(cls, response, session=None):
         """
@@ -251,19 +251,19 @@ class Job(object):
             response from POST to /async
         session : requests.Session
             session object
-        
+
         Returns Job instance
         """
         logger.debug('Try to get job location from redirect header')
         url = response.history[0].headers['Location']
         logger.debug(url)
         logger.debug(response.url)
-        
-        assert response.headers['Content-Type'] == 'text/xml;charset=UTF-8'
+
+        # assert response.headers['Content-Type'] == 'text/xml;charset=UTF-8'
 
         parsed = Job.parse_xml(response.text)
         return cls(url=url, session=session, **parsed)
-    
+
     @staticmethod
     def parse_xml(xml):
         """Parse XML response from an async TAP job
@@ -271,23 +271,24 @@ class Job(object):
         out = {}
         root = ET.fromstring(xml)
         for k, v in Job._lookup.items():
-            out[k] = root.find(v, ns).text
-        
+            item = root.find(v, ns)
+            out[k] = item.text if item is not None else None
+
         out['query'] = root.find(".//uws:parameter[@id='query']", ns).text
         out['format'] = root.find(".//uws:parameter[@id='format']", ns).text
         logger.debug('Current phase: {0}'.format(out['phase']))
-    
+
         if out['phase'] == 'COMPLETED':
             result = root.find('.//uws:results//uws:result', ns)
             out['result_url'] = result.attrib['{{{xlink}}}href'.format(**ns)]
-        
+
         has_error_message = root.find(".//uws:errorSummary/uws:message", ns)
         if has_error_message is not None:
             out['message'] = has_error_message.text
         else:
             out['message'] = None
         return out
-    
+
     @property
     def phase(self):
         """Current status of the job"""
@@ -308,11 +309,11 @@ class Job(object):
                     raise e
             else:
                 return self._phase
-    
+
     @property
     def finished(self):
         return self.phase == 'COMPLETED'
-    
+
     #TODO: this should be cached
     def get_result(self, sleep=0.5, wait=True):
         """
@@ -353,7 +354,7 @@ class Job(object):
                 return Table.read(io.BytesIO(r.content), format='fits')
         except HTTPError as e:
             raise e
-    
+
 
 class TapPlusJob(Job):
     # TODO: add session to Job for authenticated access: at Job class?
