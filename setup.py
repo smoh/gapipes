@@ -23,7 +23,7 @@ setup(
     author_email="smohspace@outlook.com",
 
     description="blurb",
-    long_description=read("README.rst"),
+    long_description=read("README.md"),
 
     packages=find_packages(exclude=('tests',)),
 
