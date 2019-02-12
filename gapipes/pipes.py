@@ -1,5 +1,5 @@
 """
-Module containing frequent calculations on Gaia DataFrame
+Module containing frequent calculations on Gaia DataFrames
 """
 
 import numpy as np
@@ -18,19 +18,15 @@ def calculate_vtan_error(df):
 
     Returns (vra_error, vdec_error) in km/s
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
-    vra_error = np.hypot(df.pmra_error/df.parallax,
-                         df.parallax_error/df.parallax**2*df.pmra)*4.74
-    vdec_error = np.hypot(df.pmdec_error/df.parallax,
-                          df.parallax_error/df.parallax**2*df.pmdec)*4.74
+    vra_error = np.hypot(df['pmra_error']/df['parallax'],
+                         df['parallax_error']/df['parallax']**2*df['pmra'])*4.74
+    vdec_error = np.hypot(df['pmdec_error']/df['parallax'],
+                          df['parallax_error']/df['parallax']**2*df['pmdec'])*4.74
     return vra_error, vdec_error
 
 
 def add_vtan_errors(df):
     """ Add 'vra_error' and 'vdec_error' columns to Gaia DataFrame """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
     vra_error, vdec_error = calculate_vtan_error(df)
     df['vra_error'] = vra_error
@@ -40,8 +36,6 @@ def add_vtan_errors(df):
 
 def add_vtan(df):
     """ Add 'vra' and 'vdec' columns to Gaia DataFrame """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
     vra, vdec = df.pmra/df.parallax*4.74, df.pmdec/df.parallax*4.74
     df['vra'] = vra
@@ -51,26 +45,22 @@ def add_vtan(df):
 
 def make_icrs(df, include_pm_rv=True):
     """Returns ICRS instance from Gaia DataFrame"""
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     if not include_pm_rv:
         return coord.ICRS(
-            ra=df.ra.values*u.deg,        
-            dec=df.dec.values*u.deg,
-            distance=1000./df.parallax.values*u.pc)
+            ra=df['ra'].values*u.deg,
+            dec=df['dec'].values*u.deg,
+            distance=1000./df['parallax'].values*u.pc)
     return coord.ICRS(
-            ra=df.ra.values*u.deg,        
-            dec=df.dec.values*u.deg,
-            distance=1000./df.parallax.values*u.pc,
-            pm_ra_cosdec=df.pmra.values*u.mas/u.year,
-            pm_dec=df.pmdec.values*u.mas/u.year,
-            radial_velocity=df.radial_velocity.values*u.km/u.s)
+            ra=df['ra'].values*u.deg,
+            dec=df['dec'].values*u.deg,
+            distance=1000./df['parallax'].values*u.pc,
+            pm_ra_cosdec=df['pmra'].values*u.mas/u.year,
+            pm_dec=df['pmdec'].values*u.mas/u.year,
+            radial_velocity=df['radial_velocity'].values*u.km/u.s)
 
 
 def add_x(df, frame, unit=u.pc):
     """Add cartesian coordinates `x`, `y`, `z` of a given `frame`"""
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
     c = make_icrs(df, include_pm_rv=False).transform_to(frame)
     df['x'], df['y'], df['z'] = c.cartesian.xyz.to(unit).value
@@ -80,12 +70,12 @@ def add_x(df, frame, unit=u.pc):
 def add_xv(df, frame, unit=u.pc):
     """
     Add cartesian coordinates x, y, z, vx, vy, vz for a given `frame`
-    
+
     df : pd.DataFrame
         Gaia DR2 data
     frame : astropy coordinate frame
         Frame to calculate coordinates in
-    
+
     Returns df with x, y, z, vx, vy, vz columns added.
     """
     if not isinstance(df, pd.DataFrame):
@@ -102,8 +92,6 @@ def add_a_g_error(df):
 
     Returns df with a_g_lerr, a_g_uerr columns added.
     """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
     lerr = df['a_g_val'] - df['a_g_percentile_lower']
     uerr = df['a_g_percentile_upper'] - df['a_g_val']
@@ -113,8 +101,6 @@ def add_a_g_error(df):
 
 def add_distmod(df):
     """Add distance modulus `distmod`"""
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
     df['distmod'] = 5*np.log10(df['parallax']) - 10
     return df
@@ -122,8 +108,6 @@ def add_distmod(df):
 
 def add_gMag(df):
     """Add absolute G Mag `gMag`"""
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
     df['gMag'] = df['phot_g_mean_mag'] + 5*np.log10(df['parallax']) - 10
     return df
@@ -131,10 +115,8 @@ def add_gMag(df):
 
 def flag_good_phot(df):
     """Add """
-    if not isinstance(df, pd.DataFrame):
-        raise ValueError("df should be a pandas.DataFrame")
     df = df.copy()
-    good_phot = ((df.phot_bp_rp_excess_factor > 1+0.015*df.bp_rp**2)
-                 & (df.phot_bp_rp_excess_factor < 1.3+0.06*df.bp_rp**2))
+    good_phot = ((df['phot_bp_rp_excess_factor'] > 1+0.015*df['bp_rp']**2)
+                 & (df['phot_bp_rp_excess_factor'] < 1.3+0.06*df['bp_rp']**2))
     df['good_phot'] = good_phot
     return df
