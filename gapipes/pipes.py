@@ -1,7 +1,7 @@
 """
 Module containing frequent calculations on Gaia DataFrames
 """
-
+import os
 import numpy as np
 import pandas as pd
 import astropy.coordinates as coord
@@ -119,4 +119,37 @@ def flag_good_phot(df):
     good_phot = ((df['phot_bp_rp_excess_factor'] > 1+0.015*df['bp_rp']**2)
                  & (df['phot_bp_rp_excess_factor'] < 1.3+0.06*df['bp_rp']**2))
     df['good_phot'] = good_phot
+    return df
+
+
+class RUWECalculator(object):
+    """Calculate renormalized unit weight error for Gaia DR2 sources"""
+    def __init__(self):
+        from scipy.interpolate import NearestNDInterpolator
+        fn = os.path.join(os.path.dirname(__file__), 'data', 'table_u0_g_col.txt')
+        self.data = pd.read_csv(fn, skipinitialspace=True)
+        self.interp = NearestNDInterpolator(d[['bp_rp', 'g_mag']].values, d['u0'].values)
+
+    def __call__(self, bp_rp, g_mag):
+        bp_rp, g_mag = np.atleast_1d(bp_rp), np.atleast_1d(g_mag)
+        if np.isnan(g_mag).any():
+            raise ValueError("g_mag should not contain NaNs")
+        bp_rp_inan = np.isnan(bp_rp)
+        bp_rp = bp_rp[bp_rp_inan] = 0.9
+        return self.interp(np.vstack([bp_rp, g_mag]).T)
+
+
+calculate_ruwe = RUWECalculator()
+
+def add_ruwe(df):
+    """Add RUWE column to df"""
+    df = df.copy()
+    df['ruwe'] = calculate_ruwe(df['bp_rp'].values, df['phot_g_mean_mag'].values)
+    return df
+
+
+def add_uwe(df):
+    """Add UWE column to df"""
+    df = df.copy()
+    df['uwe'] = np.sqrt(df['astrometric_chi2_al']/(df['astrometric_n_good_obs_al'] - 5))
     return df
