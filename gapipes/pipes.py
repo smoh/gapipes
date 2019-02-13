@@ -9,7 +9,9 @@ import astropy.units as u
 
 __all__ = [
     'calculate_vtan_error', 'add_vtan_errors', 'add_vtan',
-    'make_icrs', 'add_x', 'add_xv', 'add_a_g_error', 'add_gMag', 'flag_good_phot']
+    'make_icrs', 'add_x', 'add_xv', 'add_a_g_error',
+    'add_gMag', 'flag_good_phot',
+    'RUWECalculator', 'calculate_ruwe', 'add_ruwe', 'add_uwe']
 
 
 def calculate_vtan_error(df):
@@ -126,9 +128,9 @@ class RUWECalculator(object):
     """Calculate renormalized unit weight error for Gaia DR2 sources"""
     def __init__(self):
         from scipy.interpolate import NearestNDInterpolator
-        fn = os.path.join(os.path.dirname(__file__), 'data', 'table_u0_g_col.txt')
+        fn = os.path.join(os.path.dirname(__file__), 'data/DR2_RUWE_V1', 'table_u0_g_col.txt')
         self.data = pd.read_csv(fn, skipinitialspace=True)
-        self.interp = NearestNDInterpolator(d[['bp_rp', 'g_mag']].values, d['u0'].values)
+        self.interp = NearestNDInterpolator(self.data[['bp_rp', 'g_mag']].values, self.data['u0'].values)
 
     def __call__(self, bp_rp, g_mag):
         bp_rp, g_mag = np.atleast_1d(bp_rp), np.atleast_1d(g_mag)
@@ -140,6 +142,7 @@ class RUWECalculator(object):
 
 
 calculate_ruwe = RUWECalculator()
+
 
 def add_ruwe(df):
     """Add RUWE column to df"""
