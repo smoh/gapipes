@@ -11,7 +11,7 @@ __all__ = [
     'calculate_vtan_error', 'add_vtan_errors', 'add_vtan',
     'make_icrs', 'add_x', 'add_xv', 'add_a_g_error',
     'add_gMag', 'flag_good_phot',
-    'RUWECalculator', 'calculate_ruwe', 'add_ruwe', 'add_uwe']
+    'UWE0Calculator', 'calculate_uwe0', 'add_ruwe', 'add_uwe']
 
 
 def calculate_vtan_error(df):
@@ -124,8 +124,8 @@ def flag_good_phot(df):
     return df
 
 
-class RUWECalculator(object):
-    """Calculate renormalized unit weight error for Gaia DR2 sources"""
+class UWE0Calculator(object):
+    """Calculate unit weight error normalization for Gaia DR2 sources"""
     def __init__(self):
         from scipy.interpolate import NearestNDInterpolator
         fn = os.path.join(os.path.dirname(__file__), 'data/DR2_RUWE_V1', 'table_u0_g_col.txt')
@@ -133,21 +133,24 @@ class RUWECalculator(object):
         self.interp = NearestNDInterpolator(self.data[['bp_rp', 'g_mag']].values, self.data['u0'].values)
 
     def __call__(self, bp_rp, g_mag):
+        """Returns uwe0 that should be divided from uwe as a function of bp_rp and g_mag
+        """
         bp_rp, g_mag = np.atleast_1d(bp_rp), np.atleast_1d(g_mag)
         if np.isnan(g_mag).any():
             raise ValueError("g_mag should not contain NaNs")
         bp_rp_inan = np.isnan(bp_rp)
-        bp_rp = bp_rp[bp_rp_inan] = 0.9
+        bp_rp[bp_rp_inan] = 0.9
         return self.interp(np.vstack([bp_rp, g_mag]).T)
 
 
-calculate_ruwe = RUWECalculator()
+calculate_uwe0 = UWE0Calculator()
 
 
 def add_ruwe(df):
     """Add RUWE column to df"""
     df = df.copy()
-    df['ruwe'] = calculate_ruwe(df['bp_rp'].values, df['phot_g_mean_mag'].values)
+    uwe0 = calculate_uwe0(df['bp_rp'].values, df['phot_g_mean_mag'].values)
+    df['ruwe'] = np.sqrt(df['astrometric_chi2_al']/(df['astrometric_n_good_obs_al'] - 5)) / uwe0
     return df
 
 
