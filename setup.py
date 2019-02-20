@@ -31,7 +31,8 @@ setup(
         'pandas>=0.23',
         'requests',
         'astropy>=3',
-        'beautifulsoup4>=4.6'],
+        'beautifulsoup4>=4.6',
+        'scipy'],
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
