@@ -5,8 +5,6 @@ import io
 import logging
 import re
 import time
-from functools import partial
-from collections import namedtuple
 import requests
 from requests.exceptions import HTTPError
 from bs4 import BeautifulSoup
@@ -15,7 +13,6 @@ from astropy.table import Table
 import pandas as pd
 
 import warnings
-
 
 
 logger = logging.getLogger(__name__)
@@ -72,80 +69,6 @@ def parse_votable_error_response(response):
     return message.strip()
 
 
-class ColumnMeta(
-    namedtuple('ColumnMeta', ['name', 'unit', 'datatype', 'description'],
-               defaults=['', '', '', ''])):
-    """
-    Column meta data
-    """
-
-    def __repr__(self):
-        # NOTE: Column description can be very long. In order to have
-        # nice and useful info, truncate description.
-        s = 'Column(name="{s.name:s}", unit="{s.unit:s}", description='\
-            .format(s=self)
-        remaining_length = 80-len(s)
-        s += '"{desc}"'.format(desc=self.description[:remaining_length])
-        s += "..." if len(self.description) > remaining_length else "" + ")"
-        return s
-
-    def __str__(self):
-        # Descriptions are printed in full when this class is printed.
-        return "Column name: {s.name}\nunit: {s.unit}"\
-               "\ndesription: {s.description}".format(s=self)
-
-
-class TableMeta(
-    namedtuple('TableMeta', ['name', 'schema', 'description', 'columns'])):
-    """
-    Table meta data
-    """
-
-    @property
-    def as_table(self):
-        rows = list(map(
-            lambda c: (c.name, c.datatype, c.unit, c.description[:60]),
-            self.columns))
-        return Table(rows=rows,
-                     names=['name', 'datatype', 'unit', 'short_description'])
-
-    def __repr__(self):
-        return "{schema:s}.{name:s}, {ncolumns:d} columns".format(
-            schema=self.schema, name=self.name, ncolumns=len(self.columns))
-
-
-class TableSet(list):
-    """
-    A list of TableMeta that supports filtering
-    """
-
-    def filter(self, schema=None, table=None):
-        """
-        Filter tables by schema or table name
-
-        Parameters
-        ---------
-        schema : str or list of str
-            schemas to get
-        table : str or list of str
-            tables to get
-        """
-        if schema is None and table is None:
-            raise ValueError('Specify at least one of `schema` or `table`.')
-        def check_schema(schema, t):
-            return t.schema in schema
-        def check_table(table, t):
-            return t.name in table
-        filtered = self.copy()
-        if schema is not None:
-            schema = set([schema]) if isinstance(schema, str) else set(schema)
-            filtered = list(filter(partial(check_schema, schema), filtered))
-        if table is not None:
-            table = set([table]) if isinstance(table, str) else set(table)
-            filtered = list(filter(partial(check_table, table), filtered))
-        return TableSet(filtered)
-
-
 def parse_tableset(xml):
     """
     Parse vod:tableset XML and return a list of tables
@@ -157,12 +80,13 @@ def parse_tableset(xml):
 
     Returns
     -------
-    tables : TableSet
-        list of tables
+    tables, columns : pandas.DataFrame
+        tables of tables and columns available.
     """
     root = ET.fromstring(xml)
     # save (schema, table name, table description) for each table
     tables = []
+    columns = []
     for schema in root.findall('.//schema'):
         schema_name = schema.find('name').text
         if schema_name in ['tap_schema', 'external']:
@@ -175,7 +99,6 @@ def parse_tableset(xml):
                 table_name = table_name.split('.')[-1]
             table_desc = table.find('description').text
             table_desc = xstr(table_desc).strip()
-            columns = []
             for col in table.findall('.//column'):
                 # columns has these tags
                 # {('name', 'description', 'unit', 'dataType'),
@@ -186,10 +109,10 @@ def parse_tableset(xml):
                 col_desc = xstr(col.find('description').text).strip()
                 col_unit = xstr(col.find('unit').text).strip()
                 col_dtype = xstr(col.find('dataType').text).strip()
-                columns.append(ColumnMeta(col_name, col_unit, col_dtype, col_desc))
-            tables.append(
-                TableMeta(table_name, schema_name, table_desc, columns))
-    return TableSet(tables)
+                columns.append((schema_name, table_name, col_name, col_unit, col_dtype, col_desc))
+            tables.append((schema_name, table_name, table_desc))
+    return pd.DataFrame(tables, columns=['schema', 'table_name', 'description']),\
+        pd.DataFrame(columns, columns=['schema', 'table_name', 'column_name', 'unit', 'dtype', 'description'])
 
 
 class Job(object):

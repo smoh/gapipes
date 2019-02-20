@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Save responses for predefined queries to Gaia Archive
+"""
+
 import pickle
 from gapipes import Tap
 from astropy.table import Table

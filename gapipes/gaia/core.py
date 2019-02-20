@@ -36,6 +36,7 @@ class Tap(object):
         HTTP port; Default: 80 for http and 443 for https
     """
     _tables = None
+    _columns = None
 
     def __init__(self, host, path, protocol='http', port=80):
         self.protocol = protocol
@@ -52,7 +53,7 @@ class Tap(object):
 
     @staticmethod
     def parse_tableset(xml):
-        """Parse vod:tableset XML and return a list of tables
+        """Parse vod:tableset XML and return a list of (tables, columns)
 
         Parameters
         ----------
@@ -61,14 +62,21 @@ class Tap(object):
 
         Returns
         -------
-        tableset : TableSet
-            list of tables
+        tables, columns : pandas.DataFrame
+            list of tables and columns for all available tables
         """
         return utils.parse_tableset(xml)
 
     @staticmethod
     def parse_result_table(response, format):
-        """Parse and return the right table format
+        """Parse the returned table according to its format
+
+        Parameters
+        ----------
+        response : requests.Response
+            response to query from server
+        format : str
+            the table format, e.g., 'csv'
         """
         if format not in ['votable', 'csv', 'fits']:
             raise ValueError('format is not recognized')
@@ -80,6 +88,7 @@ class Tap(object):
                 warnings.simplefilter("ignore")
                 return Table.read(io.BytesIO(response.content), format='votable')
         elif format == 'fits':
+            #TODO: this is broken but I don't know why.
             return Table.read(io.BytesIO(response.content), format='fits')
 
     @property
@@ -90,11 +99,27 @@ class Tap(object):
         if self._tables is None:
             response = self.session.get("{s.tap_endpoint}/tables".format(s=self))
             if not response.raise_for_status():
-                tables = Tap.parse_tableset(response.text)
+                tables, columns = Tap.parse_tableset(response.text)
                 self._tables = tables
+                self._columns = columns
                 return tables
         else:
             return self._tables
+
+    @property
+    def columns(self):
+        """
+        List of columns for all tables
+        """
+        if self._tables is None:
+            response = self.session.get("{s.tap_endpoint}/tables".format(s=self))
+            if not response.raise_for_status():
+                tables, columns = Tap.parse_tableset(response.text)
+                self._tables = tables
+                self._columns = columns
+                return columns
+        else:
+            return self._columns
 
     def _post_query(self, query, name=None,
                     upload_resource=None, upload_table_name=None,
@@ -352,8 +377,8 @@ class GaiaTapPlus(Tap):
 
         try:
             r.raise_for_status()
-            tables = self.parse_tableset(r.text)
-            return tables
+            tables, columns = self.parse_tableset(r.text)
+            return tables, columns
         except HTTPError as e:
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e

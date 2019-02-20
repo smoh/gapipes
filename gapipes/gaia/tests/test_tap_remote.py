@@ -7,11 +7,12 @@ from astropy.table import Table
 def gaiatap():
     return Tap.from_url("http://gea.esac.esa.int:80/tap-server/tap")
 
-def test_query(gaiatap):
-    query = 'select top 5 * from gaiadr1.tgas_source;'
-    r = gaiatap.query(query)
-    assert isinstance(r, pd.DataFrame)
-    assert len(r) == 5
+class TestTap(object):
+    def test_simple_query(self, gaiatap):
+        query = 'select top 5 * from gaiadr1.tgas_source;'
+        r = gaiatap.query(query)
+        assert isinstance(r, pd.DataFrame)
+        assert len(r) == 5
 
 def test_query_with_upload(gaiatap):
     query = 'select * from TAP_UPLOAD.mytable;'
