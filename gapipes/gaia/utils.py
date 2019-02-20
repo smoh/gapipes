@@ -21,9 +21,6 @@ __all__ = [
     'parse_html_error_response',
     'parse_votable_error_response',
     'parse_tableset',
-    'ColumnMeta',
-    'TableMeta',
-    'TableSet',
     'Job'
 ]
 
