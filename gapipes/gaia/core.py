@@ -355,6 +355,8 @@ class GaiaTapPlus(Tap):
         ----------
         tables : str
             comma-separated name of schema.tables to query
+            If None, list of all available tables is returned. This includes
+            user tables when logged in.
         only_tables : bool
             True to get table names only
         share_accessible : bool
@@ -362,8 +364,16 @@ class GaiaTapPlus(Tap):
 
         Returns
         -------
-        tables : TableSet
-            list of tables
+        tables, columns : pandas.DataFrame
+            list of tables and columns
+
+
+        .. note::
+            `only_tables` is only effective when listing all tables (i.e., tables=None)
+
+        .. note::
+            The result depends on whether you are logged in or not.
+            If you are logged in, your user tables will also be included.
         """
         url = "{s.tap_endpoint}/tables".format(s=self)
         logger.debug("tables url = {:s}".format(url))
@@ -383,6 +393,7 @@ class GaiaTapPlus(Tap):
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
 
+    #TODO: FIX THIS
     def upload_table(self, upload_resource, table_name,
                      table_description="",
                      format='votable'):
@@ -404,12 +415,7 @@ class GaiaTapPlus(Tap):
         url = "{s.baseurl:s}/{s.upload_context}".format(s=self)
         # url = "https://gea.esac.esa.int/tap-server/Upload"
         logger.debug("upload_table url = {:s}".format(url))
-        # TODO: WOW. It actaully seems necessary to pass on TASKID
-        # Otherwise you will get 500 Internal server error.
-        # This is confirmed even with curl in command line.
-        # This is not docummented in gaia help page.
         args = {
-            'TASKID': str(-1),
             'TABLE_NAME': table_name,
             'TABLE_DESC': table_description,
             'FORMAT': format
@@ -458,6 +464,46 @@ class GaiaTapPlus(Tap):
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
 
-    def list_jobs(self, kind='sync', offset=0, limit=100):
-        #todo
-        pass
+    def list_jobs(self, kind='async', offset=0, limit=100):
+        """Get the list of jobs from server
+
+        Parameters
+        ----------
+        kind : str, optional
+            'sync' or 'async'
+        offset : int, optional
+            number of jobs to skip
+        limit : int, optional
+            maximum number of jobs to return
+
+        Returns
+        -------
+        pandas.DataFrame
+            list of jobs
+
+
+        .. note::
+            The result depends on whether you are logged in or not.
+            If you are logged in, only your jobs will be returned.
+            If you are not logged in, all anonymous jobs will be returned.
+        """
+        # NOTE: /jobs/sync returns nothing...
+        if kind not in ['sync', 'async']:
+            raise ValueError("`kind` must be one of 'sync' or 'async'")
+        args = {
+            "OFFSET": offset,
+            "LIMIT": limit
+        }
+        url = "{s.tap_endpoint:s}/jobs/{kind:s}".format(s=self, kind=kind)
+        logger.debug(url)
+
+        r = self.session.get(url, params=args)
+        try:
+            r.raise_for_status()
+            import xml.etree.ElementTree as ET
+            root = ET.fromstring(r.content)
+            jobs = list(map(Job.parse_xml, root))
+            return pd.DataFrame(jobs)
+        except HTTPError as e:
+            message = parse_html_error_response(r.text)
+            raise HTTPError(message) from e

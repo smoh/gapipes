@@ -187,9 +187,15 @@ class Job(object):
     @staticmethod
     def parse_xml(xml):
         """Parse XML response from an async TAP job
+
+        xml : str or xml.etree.ElemenTree.Element
+            xml to parse
         """
         out = {}
-        root = ET.fromstring(xml)
+        if isinstance(xml, ET.Element):
+            root = xml
+        else:
+            root = ET.fromstring(xml)
         for k, v in Job._lookup.items():
             item = root.find(v, ns)
             out[k] = item.text if item is not None else None
