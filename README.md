@@ -11,8 +11,3 @@ Installation
 License
 -------
 
-
-Authors
--------
-
-gapipes was written by [Semyeong Oh](smohspace@outlook.com).

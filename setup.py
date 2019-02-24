@@ -20,9 +20,9 @@ setup(
     license='MIT',
 
     author="Semyeong Oh",
-    author_email="smohspace@outlook.com",
+    author_email="semyeong.oh@gmail.com",
 
-    description="blurb",
+    description="Lightweight collection of routines for fast exploration of Gaia+",
     long_description=read("README.md"),
 
     packages=find_packages(exclude=('tests',)),

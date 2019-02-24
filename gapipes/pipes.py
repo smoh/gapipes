@@ -13,22 +13,24 @@ __all__ = [
     'add_gMag', 'flag_good_phot',
     'UWE0Calculator', 'calculate_uwe0', 'add_ruwe', 'add_uwe']
 
+# conversion factor from mas/yr * mas to km/s
+_tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
+
 
 def calculate_vtan_error(df):
-    """
-    Calculate tangential velocity errors with small error propagation
+    """Calculate tangential velocity errors with small error propagation
 
     Returns (vra_error, vdec_error) in km/s
     """
     vra_error = np.hypot(df['pmra_error']/df['parallax'],
-                         df['parallax_error']/df['parallax']**2*df['pmra'])*4.74
+                         df['parallax_error']/df['parallax']**2*df['pmra'])*_tokms
     vdec_error = np.hypot(df['pmdec_error']/df['parallax'],
-                          df['parallax_error']/df['parallax']**2*df['pmdec'])*4.74
+                          df['parallax_error']/df['parallax']**2*df['pmdec'])*_tokms
     return vra_error, vdec_error
 
 
 def add_vtan_errors(df):
-    """ Add 'vra_error' and 'vdec_error' columns to Gaia DataFrame """
+    """Add 'vra_error' and 'vdec_error' columns to Gaia DataFrame """
     df = df.copy()
     vra_error, vdec_error = calculate_vtan_error(df)
     df['vra_error'] = vra_error
@@ -37,16 +39,29 @@ def add_vtan_errors(df):
 
 
 def add_vtan(df):
-    """ Add 'vra' and 'vdec' columns to Gaia DataFrame """
+    """Add 'vra' and 'vdec' columns to Gaia DataFrame """
     df = df.copy()
-    vra, vdec = df.pmra/df.parallax*4.74, df.pmdec/df.parallax*4.74
+    vra, vdec = df.pmra/df.parallax*_tokms, df.pmdec/df.parallax*_tokms
     df['vra'] = vra
     df['vdec'] = vdec
     return df
 
 
 def make_icrs(df, include_pm_rv=True):
-    """Returns ICRS instance from Gaia DataFrame"""
+    """Make ICRS coordinates from Gaia DataFrame
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Gaia DataFrame
+    include_pm_rv : bool, optional
+        Include proper motions and radial velocities
+
+    Returns
+    -------
+    coordinates : astropy.coordinates.ICRS
+        coordinates
+    """
     if not include_pm_rv:
         return coord.ICRS(
             ra=df['ra'].values*u.deg,
@@ -70,8 +85,7 @@ def add_x(df, frame, unit=u.pc):
 
 
 def add_xv(df, frame, unit=u.pc):
-    """
-    Add cartesian coordinates x, y, z, vx, vy, vz for a given `frame`
+    """Add cartesian coordinates x, y, z, vx, vy, vz for a given `frame`
 
     df : pd.DataFrame
         Gaia DR2 data
@@ -116,7 +130,10 @@ def add_gMag(df):
 
 
 def flag_good_phot(df):
-    """Add """
+    """Add 'good_phot' boolean column to the dataframe
+
+    TODO: explain
+    """
     df = df.copy()
     good_phot = ((df['phot_bp_rp_excess_factor'] > 1+0.015*df['bp_rp']**2)
                  & (df['phot_bp_rp_excess_factor'] < 1.3+0.06*df['bp_rp']**2))
@@ -133,7 +150,24 @@ class UWE0Calculator(object):
         self.interp = NearestNDInterpolator(self.data[['bp_rp', 'g_mag']].values, self.data['u0'].values)
 
     def __call__(self, bp_rp, g_mag):
-        """Returns uwe0 that should be divided from uwe as a function of bp_rp and g_mag
+        """Calculate unit weight error normalization factor
+
+        Parameters
+        ----------
+        bp_rp : array-like
+            BP-RP colors of sources
+        g_mag : array-like
+            Gaia G magnitudes of sources
+
+        Raises
+        ------
+        ValueError
+            if g_mag contains any NaNs
+
+        Returns
+        -------
+        array-like
+            normalization factor
         """
         bp_rp, g_mag = np.atleast_1d(bp_rp), np.atleast_1d(g_mag)
         if np.isnan(g_mag).any():
@@ -147,7 +181,7 @@ calculate_uwe0 = UWE0Calculator()
 
 
 def add_ruwe(df):
-    """Add RUWE column to df"""
+    """Add renormalized unit weight error 'ruwe' column to df"""
     df = df.copy()
     uwe0 = calculate_uwe0(df['bp_rp'].values, df['phot_g_mean_mag'].values)
     df['ruwe'] = np.sqrt(df['astrometric_chi2_al']/(df['astrometric_n_good_obs_al'] - 5)) / uwe0
@@ -155,7 +189,7 @@ def add_ruwe(df):
 
 
 def add_uwe(df):
-    """Add UWE column to df"""
+    """Add unit weight error 'uwe' column to df"""
     df = df.copy()
     df['uwe'] = np.sqrt(df['astrometric_chi2_al']/(df['astrometric_n_good_obs_al'] - 5))
     return df
