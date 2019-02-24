@@ -10,6 +10,9 @@ Gaia
 .. autoclass:: gapipes.GaiaTapPlus
     :members:
 
+Utils
+^^^^^
+
 .. automodule:: gapipes.gaia.utils
     :members:
 

@@ -10,7 +10,7 @@ Welcome to gapipes!
 
 It provides
 
-- sensible and tested interface to `Gaia TAP+ <#>`_ and `DataLink Service <#>`_
+- sensible and tested interface to `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_
 - `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pipe.html?highlight=pipes>`_ to process Gaia DataFrames quickly and easily.
 
 
@@ -22,7 +22,7 @@ User Guide
 
    getting-started
    using-pipes
-   
+
 
 
 .. toctree::
@@ -30,4 +30,3 @@ User Guide
    :hidden:
 
    api
-   
