@@ -6,12 +6,12 @@
 Welcome to gapipes!
 ===================
 
-**gapipes** is a collection of routines to fetch and work with `Gaia <#>`_ data.
+**gapipes** is a lightweight collection of routines to fetch and work with `Gaia <#>`_ data.
 
 It provides
 
 - sensible and tested interface to `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_
-- `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.pipe.html?highlight=pipes>`_ to process Gaia DataFrames quickly and easily.
+- `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pipe.html>`_ to process Gaia DataFrames quickly and easily.
 
 
 User Guide
