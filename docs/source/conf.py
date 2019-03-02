@@ -94,8 +94,7 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 html_theme_options = {
-    'fixed_sidebar': 'true',
-
+    'analytics_id': 'UA-37308551-2'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
