@@ -10,7 +10,6 @@ class GaiaAccessor(object):
     def __init__(self, df):
         self._validate(df)
         self._df = df
-        self._icrs = None
 
     @staticmethod
     def _validate(df):
@@ -20,6 +19,19 @@ class GaiaAccessor(object):
 
     @property
     def icrs(self):
+        """ICRS coordinates of sources using all available columns
+
+        Raises
+        ------
+        AttributeError
+            If the table does not have ra, dec and parallax columns
+
+        Returns
+        -------
+        astropy.coordinates.ICRS
+            coordinates
+        """
+
         columns = set(self._df.columns.values)
         df = self._df
         if not set(['ra', 'dec', 'parallax']) < columns:
@@ -42,11 +54,14 @@ class GaiaAccessor(object):
         return self.icrs.transform_to(coord.Galactic)
 
     def make_cov(self):
-        """Make covariance matrix from Gaia dataframe (error and correlation coefficients)
+        """Generate covariance matrix from Gaia table columns
 
-        Returns array of covariance matrix of parallax, pmra, pmdec
-        with shape (N, 3, 3).
+        Returns
+        -------
+        numpy.array
+            (N, 3, 3) array of parallax, pmra, pmdec covariance matrices
         """
+
         df = self._df
         necessary_columns = set([
             'parallax_error', 'pmra_error', 'pmdec_error',
