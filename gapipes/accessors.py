@@ -20,19 +20,23 @@ class GaiaAccessor(object):
 
     @property
     def icrs(self):
-        if self._icrs is None:
-            req = set(['ra', 'dec', 'parallax', 'pmra', 'pmdec', 'radial_velocity'])
-            columns = set(self._df.columns.values)
-            if req < columns:
-                df = self._df
-                c = coord.ICRS(
-                    ra=df['ra'].values*u.deg,
-                    dec=df['dec'].values*u.deg,
-                    distance=1000./df['parallax'].values*u.pc,
-                    pm_ra_cosdec=df['pmra'].values*u.mas/u.year,
-                    pm_dec=df['pmdec'].values*u.mas/u.year,
-                    radial_velocity=df['radial_velocity'].values*u.km/u.s)
-                self._icrs = c
-            else:
-                raise AttributeError("columns missing")
-        return self._icrs
+        columns = set(self._df.columns.values)
+        df = self._df
+        if not set(['ra', 'dec', 'parallax']) < columns:
+            raise AttributeError("Must have 'ra', 'dec', 'parallax'.")
+        args = {}
+        args['ra'] = df['ra'].values*u.deg
+        args['dec'] = df['dec'].values*u.deg
+        args['distance']=1e3/df['parallax'].values*u.pc
+        if 'pmra' in columns:
+            args['pm_ra_cosdec'] = df['pmra'].values*u.mas/u.year
+        if 'pmdec' in columns:
+            args['pm_dec'] = df['pmdec'].values*u.mas/u.yr
+        if 'radial_velocity' in columns:
+            args['radial_velocity'] = df['radial_velocity'].values*u.km/u.s
+        c = coord.ICRS(**args)
+        return c
+
+    @property
+    def galactic(self):
+        return self.icrs.transform_to(coord.Galactic)
