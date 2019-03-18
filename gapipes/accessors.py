@@ -40,3 +40,26 @@ class GaiaAccessor(object):
     @property
     def galactic(self):
         return self.icrs.transform_to(coord.Galactic)
+
+    def make_cov(self):
+        """Make covariance matrix from Gaia dataframe (error and correlation coefficients)
+
+        Returns array of covariance matrix of parallax, pmra, pmdec
+        with shape (N, 3, 3).
+        """
+        df = self._df
+        necessary_columns = set([
+            'parallax_error', 'pmra_error', 'pmdec_error',
+            'parallax_pmra_corr', 'parallax_pmdec_corr',
+            'pmra_pmdec_corr'])
+        s = set(df.columns)
+        assert s >= necessary_columns, \
+            "Columns missing: {:}".format(necessary_columns-s)
+        C = np.zeros([len(df), 3, 3])
+        C[:, [0,1,2], [0,1,2]] = df[['parallax_error', 'pmra_error', 'pmdec_error']].values**2
+        C[:, [0, 1], [1, 0]] = (df['parallax_error']*df['pmra_error']*df['parallax_pmra_corr']).values[:, None]
+        C[:, [0, 2], [2, 0]] = (df['parallax_error']*df['pmdec_error']*df['parallax_pmdec_corr']).values[:, None]
+        C[:, [1, 2], [2, 1]] = (df['pmra_error']*df['pmdec_error']*df['pmra_pmdec_corr']).values[:, None]
+        return C
+
+
