@@ -26,6 +26,7 @@ setup(
     long_description=read("README.md"),
 
     packages=find_packages(exclude=('tests',)),
+    include_package_data=True,
 
     install_requires=[
         'pandas>=0.23',
