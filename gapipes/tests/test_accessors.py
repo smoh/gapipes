@@ -10,6 +10,8 @@ import gapipes as gp
 
 fn = os.path.join(os.path.dirname(__file__), 'top5.fits')
 df = Table.read(fn).to_pandas()
+# remove negative parallaxes for testing purposes
+df = df.loc[df['parallax']>0]
 
 
 def test_icrs():
@@ -44,3 +46,9 @@ def test_make_cov():
     cov = df.g.make_cov()
     assert cov.shape == (3, 3, 3)
     assert np.allclose(cov, np.repeat(np.eye(3)[None,:], 3, axis=0))
+
+
+def test_distmod():
+    # At 100 pc, distmod is zero.
+    df = pd.DataFrame(dict(parallax=[100]))
+    assert df.g.distmod.values[0] == 0

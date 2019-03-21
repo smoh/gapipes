@@ -5,6 +5,9 @@ import numpy as np
 import astropy.coordinates as coord
 import astropy.units as u
 
+# conversion factor from mas/yr * mas to km/s
+_tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
+
 @pd.api.extensions.register_dataframe_accessor("g")
 class GaiaAccessor(object):
     def __init__(self, df):
@@ -76,5 +79,21 @@ class GaiaAccessor(object):
         C[:, [0, 2], [2, 0]] = (df['parallax_error']*df['pmdec_error']*df['parallax_pmdec_corr']).values[:, None]
         C[:, [1, 2], [2, 1]] = (df['pmra_error']*df['pmdec_error']*df['pmra_pmdec_corr']).values[:, None]
         return C
+
+    @property
+    def distmod(self):
+        """Distance modulus M = m + DM
+        """
+        return 5*np.log10(self._df['parallax'])-10
+
+    @property
+    def vra(self):
+        """Velocity [km/s] in R.A. direction"""
+        return self._df['pmra']/self._df['parallax']*_tokms
+
+    @property
+    def vdec(self):
+        """Velocity [km/s] in Decl. direction"""
+        return self._df['pmdec']/self._df['parallax']*_tokms
 
 
