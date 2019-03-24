@@ -64,7 +64,7 @@ def make_icrs(df, include_pm_rv=True):
         coordinates
     """
     columns = set(df.keys())
-    if not set(['ra', 'dec', 'parallax']) < columns:
+    if not set(['ra', 'dec', 'parallax']) <= columns:
         raise AttributeError("Must have 'ra', 'dec', 'parallax'.")
     args = {}
     args['ra'] = np.array(df['ra'])*u.deg
