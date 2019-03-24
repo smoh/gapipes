@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import astropy.coordinates as coord
 import astropy.units as u
+from . import pipes as pp
 
 # conversion factor from mas/yr * mas to km/s
 _tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
@@ -34,23 +35,7 @@ class GaiaAccessor(object):
         astropy.coordinates.ICRS
             coordinates
         """
-
-        columns = set(self._df.columns.values)
-        df = self._df
-        if not set(['ra', 'dec', 'parallax']) < columns:
-            raise AttributeError("Must have 'ra', 'dec', 'parallax'.")
-        args = {}
-        args['ra'] = df['ra'].values*u.deg
-        args['dec'] = df['dec'].values*u.deg
-        args['distance']=1e3/df['parallax'].values*u.pc
-        if 'pmra' in columns:
-            args['pm_ra_cosdec'] = df['pmra'].values*u.mas/u.year
-        if 'pmdec' in columns:
-            args['pm_dec'] = df['pmdec'].values*u.mas/u.yr
-        if 'radial_velocity' in columns:
-            args['radial_velocity'] = df['radial_velocity'].values*u.km/u.s
-        c = coord.ICRS(**args)
-        return c
+        return pp.make_icrs(self._df)
 
     @property
     def galactic(self):
@@ -97,3 +82,21 @@ class GaiaAccessor(object):
         return self._df['pmdec']/self._df['parallax']*_tokms
 
 
+@pd.api.extensions.register_series_accessor("g")
+class GaiaSource(object):
+    def __init__(self, s):
+        self._d = s
+        self._keys = list(s.keys())
+
+    def open_simbad(self):
+        """Open Simbad search for this source
+        """
+        # TODO: finish
+        # url =
+        # webbrowser.open_new_tab(url)
+
+    @property
+    def icrs(self):
+        """ICRS coordinate of the source
+        """
+        return pp.make_icrs(self._d)

@@ -48,11 +48,11 @@ def add_vtan(df):
 
 
 def make_icrs(df, include_pm_rv=True):
-    """Make ICRS coordinates from Gaia DataFrame
+    """Make ICRS coordinates from Gaia data
 
     Parameters
     ----------
-    df : pandas.DataFrame
+    df : pandas.DataFrame, dict-like
         Gaia DataFrame
     include_pm_rv : bool, optional
         Include proper motions and radial velocities
@@ -62,18 +62,21 @@ def make_icrs(df, include_pm_rv=True):
     coordinates : astropy.coordinates.ICRS
         coordinates
     """
-    if not include_pm_rv:
-        return coord.ICRS(
-            ra=df['ra'].values*u.deg,
-            dec=df['dec'].values*u.deg,
-            distance=1000./df['parallax'].values*u.pc)
-    return coord.ICRS(
-            ra=df['ra'].values*u.deg,
-            dec=df['dec'].values*u.deg,
-            distance=1000./df['parallax'].values*u.pc,
-            pm_ra_cosdec=df['pmra'].values*u.mas/u.year,
-            pm_dec=df['pmdec'].values*u.mas/u.year,
-            radial_velocity=df['radial_velocity'].values*u.km/u.s)
+    columns = set(df.keys())
+    if not set(['ra', 'dec', 'parallax']) < columns:
+        raise AttributeError("Must have 'ra', 'dec', 'parallax'.")
+    args = {}
+    args['ra'] = df['ra'].values*u.deg
+    args['dec'] = df['dec'].values*u.deg
+    args['distance']=1e3/df['parallax'].values*u.pc
+    if 'pmra' in columns:
+        args['pm_ra_cosdec'] = df['pmra'].values*u.mas/u.year
+    if 'pmdec' in columns:
+        args['pm_dec'] = df['pmdec'].values*u.mas/u.yr
+    if 'radial_velocity' in columns:
+        args['radial_velocity'] = df['radial_velocity'].values*u.km/u.s
+    c = coord.ICRS(**args)
+    return c
 
 
 def add_x(df, frame, unit=u.pc):
