@@ -33,6 +33,9 @@ def test_icrs():
             ]).g.galactic,
         coord.Galactic)
 
+    # for series
+    assert df.g.icrs[0].ra == df.iloc[0].g.icrs.ra
+
 
 def test_make_cov():
     df = pd.DataFrame(dict(

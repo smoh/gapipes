@@ -69,7 +69,7 @@ class GaiaAccessor(object):
     def distmod(self):
         """Distance modulus M = m + DM
         """
-        return 5*np.log10(self._df['parallax'])-10
+        return pp.get_distmod(self._df)
 
     @property
     def vra(self):
@@ -100,3 +100,9 @@ class GaiaSource(object):
         """ICRS coordinate of the source
         """
         return pp.make_icrs(self._d)
+
+    @property
+    def distmod(self):
+        """Distance modulus M = m + DM
+        """
+        return pp.get_distmod(self._d)

@@ -10,6 +10,7 @@ import astropy.units as u
 __all__ = [
     'calculate_vtan_error', 'add_vtan_errors', 'add_vtan',
     'make_icrs', 'add_x', 'add_xv', 'add_a_g_error',
+    'get_distmod',
     'add_gMag', 'flag_good_phot',
     'UWE0Calculator', 'calculate_uwe0', 'add_ruwe', 'add_uwe']
 
@@ -66,15 +67,15 @@ def make_icrs(df, include_pm_rv=True):
     if not set(['ra', 'dec', 'parallax']) < columns:
         raise AttributeError("Must have 'ra', 'dec', 'parallax'.")
     args = {}
-    args['ra'] = df['ra'].values*u.deg
-    args['dec'] = df['dec'].values*u.deg
-    args['distance']=1e3/df['parallax'].values*u.pc
+    args['ra'] = np.array(df['ra'])*u.deg
+    args['dec'] = np.array(df['dec'])*u.deg
+    args['distance']=1e3/np.array(df['parallax'])*u.pc
     if 'pmra' in columns:
-        args['pm_ra_cosdec'] = df['pmra'].values*u.mas/u.year
+        args['pm_ra_cosdec'] = np.array(df['pmra'])*u.mas/u.year
     if 'pmdec' in columns:
-        args['pm_dec'] = df['pmdec'].values*u.mas/u.yr
+        args['pm_dec'] = np.array(df['pmdec'])*u.mas/u.yr
     if 'radial_velocity' in columns:
-        args['radial_velocity'] = df['radial_velocity'].values*u.km/u.s
+        args['radial_velocity'] = np.array(df['radial_velocity'])*u.km/u.s
     c = coord.ICRS(**args)
     return c
 
@@ -118,10 +119,15 @@ def add_a_g_error(df):
     return df
 
 
+def get_distmod(df):
+    """Calculate distance modulus from parallax
+    """
+    return 5*np.log10(df['parallax']) - 10
+
 def add_distmod(df):
     """Add distance modulus `distmod`"""
     df = df.copy()
-    df['distmod'] = 5*np.log10(df['parallax']) - 10
+    df['distmod'] = get_distmod(df)
     return df
 
 
