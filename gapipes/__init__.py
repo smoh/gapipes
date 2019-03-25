@@ -5,5 +5,4 @@ __author__ = 'Semyeong Oh <smohspace@outlook.com>'
 
 from .pipes import *
 from .gaia import *
-
-from . import accessors
+from .accessors import *

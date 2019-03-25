@@ -11,7 +11,8 @@ Welcome to gapipes!
 It provides
 
 - sensible and tested interface to `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_
-- `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pipe.html>`_ to process Gaia DataFrames quickly and easily.
+- `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pipe.html>`_ to process Gaia DataFrames quickly and easily
+- custom accessors to pandas DataFrame and Series to do common operations on the Gaia data.
 
 
 .. code-block:: python

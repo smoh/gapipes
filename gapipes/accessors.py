@@ -6,6 +6,11 @@ import astropy.coordinates as coord
 import astropy.units as u
 from . import pipes as pp
 
+__all__ = [
+    'GaiaData',
+    'GaiaSource'
+]
+
 # conversion factor from mas/yr * mas to km/s
 _tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
 
