@@ -50,6 +50,9 @@ def test_make_cov():
     assert cov.shape == (3, 3, 3)
     assert np.allclose(cov, np.repeat(np.eye(3)[None,:], 3, axis=0))
 
+    s = df.iloc[0]
+    assert np.allclose(s.g.make_cov(), np.eye(3))
+
 
 def test_distmod():
     # At 100 pc, distmod is zero.

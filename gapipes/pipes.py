@@ -10,7 +10,7 @@ import astropy.units as u
 __all__ = [
     'calculate_vtan_error', 'add_vtan_errors', 'add_vtan',
     'make_icrs', 'add_x', 'add_xv', 'add_a_g_error',
-    'get_distmod',
+    'get_distmod', 'make_cov',
     'add_gMag', 'flag_good_phot',
     'UWE0Calculator', 'calculate_uwe0', 'add_ruwe', 'add_uwe']
 
@@ -78,6 +78,30 @@ def make_icrs(df, include_pm_rv=True):
         args['radial_velocity'] = np.array(df['radial_velocity'])*u.km/u.s
     c = coord.ICRS(**args)
     return c
+
+
+def make_cov(df):
+    """Generate covariance matrix from Gaia table columns
+
+    Returns
+    -------
+    numpy.array
+        (N, 3, 3) array of parallax, pmra, pmdec covariance matrices
+    """
+    necessary_columns = set([
+        'parallax_error', 'pmra_error', 'pmdec_error',
+        'parallax_pmra_corr', 'parallax_pmdec_corr',
+        'pmra_pmdec_corr'])
+    s = set(df.keys())
+    assert s >= necessary_columns, \
+        "Columns missing: {:}".format(necessary_columns-s)
+    N = len(np.atleast_1d(df['parallax_error']))    # N could be 1
+    C = np.zeros([N, 3, 3])
+    C[:, [0,1,2], [0,1,2]] = np.atleast_1d(df[['parallax_error', 'pmra_error', 'pmdec_error']])**2
+    C[:, [0, 1], [1, 0]] = np.atleast_1d(df['parallax_error']*df['pmra_error']*df['parallax_pmra_corr'])[:, None]
+    C[:, [0, 2], [2, 0]] = np.atleast_1d(df['parallax_error']*df['pmdec_error']*df['parallax_pmdec_corr'])[:, None]
+    C[:, [1, 2], [2, 1]] = np.atleast_1d(df['pmra_error']*df['pmdec_error']*df['pmra_pmdec_corr'])[:, None]
+    return C.squeeze()
 
 
 def add_x(df, frame, unit=u.pc):

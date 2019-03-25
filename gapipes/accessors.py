@@ -10,7 +10,26 @@ from . import pipes as pp
 _tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
 
 @pd.api.extensions.register_dataframe_accessor("g")
-class GaiaAccessor(object):
+class GaiaData(object):
+    """Gaia data table class/accessor
+
+    This class is designed to be accessed through a custom accessor "g"
+    to a pandas DataFrame containing a gaia_source table, e.g.,
+
+    >>> df.g.icrs
+
+    However, it should also work with any table class containing Gaia data
+    that has dict-like access:
+
+    >>> type(t)
+    astropy.table.table.Table
+    >>> GaiaData(t).icrs
+
+    Parameters
+    ----------
+    df : pandas.DataFrame, dict-like
+        Gaia data table
+    """
     def __init__(self, df):
         self._validate(df)
         self._df = df
@@ -49,21 +68,7 @@ class GaiaAccessor(object):
         numpy.array
             (N, 3, 3) array of parallax, pmra, pmdec covariance matrices
         """
-
-        df = self._df
-        necessary_columns = set([
-            'parallax_error', 'pmra_error', 'pmdec_error',
-            'parallax_pmra_corr', 'parallax_pmdec_corr',
-            'pmra_pmdec_corr'])
-        s = set(df.columns)
-        assert s >= necessary_columns, \
-            "Columns missing: {:}".format(necessary_columns-s)
-        C = np.zeros([len(df), 3, 3])
-        C[:, [0,1,2], [0,1,2]] = df[['parallax_error', 'pmra_error', 'pmdec_error']].values**2
-        C[:, [0, 1], [1, 0]] = (df['parallax_error']*df['pmra_error']*df['parallax_pmra_corr']).values[:, None]
-        C[:, [0, 2], [2, 0]] = (df['parallax_error']*df['pmdec_error']*df['parallax_pmdec_corr']).values[:, None]
-        C[:, [1, 2], [2, 1]] = (df['pmra_error']*df['pmdec_error']*df['pmra_pmdec_corr']).values[:, None]
-        return C
+        return pp.make_cov(self._df)
 
     @property
     def distmod(self):
@@ -84,6 +89,21 @@ class GaiaAccessor(object):
 
 @pd.api.extensions.register_series_accessor("g")
 class GaiaSource(object):
+    """Gaia row class/accessor
+
+    This class is designed to be accessed through a custom accessor "g"
+    to a pandas Series containing a gaia_source row, e.g.,
+
+    >>> df.iloc[0].g.icrs
+
+    However, it should also work with any table class containing Gaia data
+    that has dict-like access:
+
+    Parameters
+    ----------
+    s : pandas.Series, dict-like
+        Gaia data table row for one source
+    """
     def __init__(self, s):
         self._d = s
         self._keys = list(s.keys())
@@ -106,3 +126,14 @@ class GaiaSource(object):
         """Distance modulus M = m + DM
         """
         return pp.get_distmod(self._d)
+
+    def make_cov(self):
+        """Generate covariance matrix from Gaia table columns
+
+        Returns
+        -------
+        numpy.array
+            (3, 3) array of parallax, pmra, pmdec covariance matrices
+        """
+        return pp.make_cov(self._d)
+
