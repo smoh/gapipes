@@ -1,5 +1,5 @@
 """ Custom accessors for pandas """
-
+import webbrowser
 import pandas as pd
 import numpy as np
 import astropy.coordinates as coord
@@ -114,11 +114,11 @@ class GaiaSource(object):
         self._keys = list(s.keys())
 
     def open_simbad(self):
-        """Open Simbad search for this source
+        """Open Simbad search for this source in default web browser.
         """
-        # TODO: finish
-        # url =
-        # webbrowser.open_new_tab(url)
+        url = 'http://simbad.u-strasbg.fr/simbad/sim-basic?Ident={radec}&submit=SIMBAD+search'\
+            .format(radec='{}{:+}'.format(self._d['ra'], self._d['dec']))
+        webbrowser.open_new_tab(url)
 
     @property
     def icrs(self):
