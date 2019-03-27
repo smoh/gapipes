@@ -393,7 +393,9 @@ class GaiaTapPlus(Tap):
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
 
-    #TODO: FIX THIS
+    #TODO: doument all options of upload_resource better.
+    #TODO: make it flexible to handle pandas.DataFrame seamlessly.
+    #TODO: test all options of upload_resource works.
     def upload_table(self, upload_resource, table_name,
                      table_description="",
                      format='votable'):
@@ -435,7 +437,12 @@ class GaiaTapPlus(Tap):
                 chunk = f.read()
             files = dict(FILE=chunk)
         r = self.session.post(url, data=args, files=files)
-        return r
+        try:
+            r.raise_for_status()
+            return r.text.strip()
+        except HTTPError as e:
+            message = parse_html_error_response(r.text)
+            raise HTTPError(message) from e
 
     def delete_user_table(self, table_name, force_removal=False):
         """Delete a user table
