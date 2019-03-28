@@ -12,7 +12,8 @@ __all__ = [
     'make_icrs', 'add_x', 'add_xv', 'add_a_g_error',
     'get_distmod', 'make_cov',
     'add_gMag', 'flag_good_phot',
-    'UWE0Calculator', 'calculate_uwe0', 'add_ruwe', 'add_uwe']
+    'UWE0Calculator', 'calculate_uwe0', 'add_ruwe', 'add_uwe',
+    'correct_brightsource_pm']
 
 # conversion factor from mas/yr * mas to km/s
 _tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
@@ -226,3 +227,19 @@ def add_uwe(df):
     df = df.copy()
     df['uwe'] = np.sqrt(df['astrometric_chi2_al']/(df['astrometric_n_good_obs_al'] - 5))
     return df
+
+
+def correct_brightsource_pm(df):
+    """Get proper motions corrected for DR2 bright source rotational bias.
+
+    For G <= 12, proper motions have a significant (0.15 mas/yr) rotation bias.
+    See Lindegren et al. for details.
+    """
+    omegax, omegay, omegaz = -0.086, -0.114, -0.037    # mas/yr
+    ra_rad, dec_rad = np.deg2rad(np.array(df['ra'])), np.deg2rad(np.array(df['dec']))
+    pmra, pmdec = np.array(df['pmra']), np.array(df['pmdec'])
+    pmra_new = pmra + omegax * np.sin(dec_rad) * np.cos(ra_rad)\
+                + omegay * np.sin(dec_rad) * np.sin(ra_rad)\
+                - omegaz * np.cos(dec_rad)
+    pmdec_new = pmdec - omegax * np.sin(ra_rad) + omegay * np.cos(ra_rad)
+    return pmra_new, pmdec_new

@@ -58,3 +58,17 @@ def test_distmod():
     # At 100 pc, distmod is zero.
     df = pd.DataFrame(dict(parallax=[100]))
     assert df.g.distmod.values[0] == 0
+
+
+def test_correct_brightsource_pm():
+    df = pd.DataFrame({
+        'ra': [12.34, 56.78],
+        'dec': [0., 12.32],
+        'pmra': [-1., -1.2],
+        'pmdec': [0., 0.],
+        'phot_g_mean_mag': [8., 15.2]
+    })
+    df.g.correct_brightsource_pm()
+    # only first source should be modified in pm
+    assert not np.allclose(df.loc[0, ['pmra', 'pmdec']].values, [-1, 0.])
+    assert np.allclose(df.loc[1, ['pmra', 'pmdec']].values, [-1.2, 0.])

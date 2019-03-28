@@ -1,4 +1,5 @@
 """ Custom accessors for pandas """
+import warnings
 import webbrowser
 import pandas as pd
 import numpy as np
@@ -90,6 +91,28 @@ class GaiaData(object):
     def vdec(self):
         """Velocity [km/s] in Decl. direction"""
         return self._df['pmdec']/self._df['parallax']*_tokms
+
+    def correct_brightsource_pm(self, gmag_threshold=12.):
+        """Correct bright source proper motions for rotation bias.
+
+        Parameters
+        ----------
+        gmag_threshold : float, optional
+            Threshold G mag below which the correction is applied.
+
+        Returns
+        -------
+        pandas.DataFrame
+            original dataframe with pmra, pmdec modified for bright sources.
+        """
+        if gmag_threshold > 13.:
+            warnings.warn("This correction should only be applied to bright (G <= 12) sources!")
+        bright = np.array(self._df['phot_g_mean_mag']) < gmag_threshold
+        pmra, pmdec = pp.correct_brightsource_pm(self._df.loc[bright])
+        self._df.loc[bright, 'pmra'] = pmra
+        self._df.loc[bright, 'pmdec'] = pmdec
+        return self._df
+
 
 
 @pd.api.extensions.register_series_accessor("g")
