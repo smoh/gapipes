@@ -285,8 +285,8 @@ class GaiaTapPlus(Tap):
                 "It does not make sense to initialize `TapPlus`"
                 "without all contexts set. Consider using `Tap`.")
 
-        self.server_context = server_context
-        self.upload_context = upload_context
+        self._server_context = server_context
+        self._upload_context = upload_context
 
     def login(self, user=None, password=None, credentials_file=None):
         """
@@ -321,7 +321,7 @@ class GaiaTapPlus(Tap):
             if password is None:
                 print("Invalid password")
                 return
-        url = "https://{s.host:s}/{s.server_context:s}/login".format(s=self)
+        url = "https://{s.host:s}/{s._server_context:s}/login".format(s=self)
         r = self.session.post(url, data={'username': user, 'password': password})
         try:
             r.raise_for_status()
@@ -334,7 +334,7 @@ class GaiaTapPlus(Tap):
         """
         Logout from TAP server
         """
-        url = "https://{s.host:s}/{s.server_context:s}/logout".format(s=self)
+        url = "https://{s.host:s}/{s._server_context:s}/logout".format(s=self)
         r = self.session.post(url)
         try:
             r.raise_for_status()
@@ -345,7 +345,7 @@ class GaiaTapPlus(Tap):
 
     @property
     def baseurl(self):
-        return '{s.protocol:s}://{s.host:s}/{s.server_context:s}'.format(s=self)
+        return '{s.protocol:s}://{s.host:s}/{s._server_context:s}'.format(s=self)
 
     def get_table_info(self, tables=None, only_tables=False, share_accessible=False):
         """
@@ -414,7 +414,7 @@ class GaiaTapPlus(Tap):
             resource format
             Available formats: 'VOTable', 'CSV' and 'ASCII'
         """
-        url = "{s.baseurl:s}/{s.upload_context}".format(s=self)
+        url = "{s.baseurl:s}/{s._upload_context}".format(s=self)
         # url = "https://gea.esac.esa.int/tap-server/Upload"
         logger.debug("upload_table url = {:s}".format(url))
         args = {
@@ -454,7 +454,7 @@ class GaiaTapPlus(Tap):
         force_removal : bool, optional
             flag to indicate if removal should be forced
         """
-        url = "{s.baseurl:s}/{s.upload_context}".format(s=self)
+        url = "{s.baseurl:s}/{s._upload_context}".format(s=self)
 
         # TODO: what does force removal mean?
         args = {
