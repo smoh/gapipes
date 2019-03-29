@@ -4,5 +4,6 @@ python:
 
 install:
   - pip install -e .
+  - pip install matplotlib
 
 script: pytest
