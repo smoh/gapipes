@@ -3,6 +3,7 @@ import warnings
 import webbrowser
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import astropy.coordinates as coord
 import astropy.units as u
 from . import pipes as pp
@@ -95,6 +96,8 @@ class GaiaData(object):
     def correct_brightsource_pm(self, gmag_threshold=12.):
         """Correct bright source proper motions for rotation bias.
 
+        This function modifies the original DataFrame!
+
         Parameters
         ----------
         gmag_threshold : float, optional
@@ -112,6 +115,14 @@ class GaiaData(object):
         self._df.loc[bright, 'pmra'] = pmra
         self._df.loc[bright, 'pmdec'] = pmdec
         return self._df
+
+    def plot_xyz_icrs(self, *args, **kwargs):
+        """Plot xyz coordinates in ICRS
+        """
+        fig, ax = plt.subplots(1, 2, figsize=(8, 4))
+        ax[0].scatter(self.icrs.cartesian.x, self.icrs.cartesian.y, s=2);
+        ax[1].scatter(self.icrs.cartesian.x, self.icrs.cartesian.z, s=2);
+        return fig
 
 
 
