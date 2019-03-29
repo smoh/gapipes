@@ -12,7 +12,11 @@ It provides
 
 - sensible and tested interface to `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_
 - `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pipe.html>`_ to process Gaia DataFrames quickly and easily
-- custom accessors to pandas DataFrame and Series to do common operations on the Gaia data.
+- [custom accessors](https://pandas.pydata.org/pandas-docs/stable/development/extending.html) to pandas DataFrame and Series to do common operations on the Gaia data.
+
+.. note::
+
+The code is very much under [active development](https://github.com/smoh/gapipes).
 
 
 .. code-block:: python
