@@ -15,8 +15,7 @@ It provides
 - [custom accessors](https://pandas.pydata.org/pandas-docs/stable/development/extending.html) to pandas DataFrame and Series to do common operations on the Gaia data.
 
 .. note::
-
-The code is very much under [active development](https://github.com/smoh/gapipes).
+  The code is very much under `active development <https://github.com/smoh/gapipes)>`_.
 
 
 .. code-block:: python
