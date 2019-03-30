@@ -13,6 +13,7 @@ It provides
 - sensible and tested interface to `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_
 - `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pipe.html>`_ to process Gaia DataFrames quickly and easily
 - `custom accessors <https://pandas.pydata.org/pandas-docs/stable/development/extending.html>`_ to pandas DataFrame and Series to do common operations on the Gaia data such as
+
   - making astropy `coordinates <http://docs.astropy.org/en/stable/coordinates/index.html>`_ objects
   - calculating `renormalized unit weight error <https://www.cosmos.esa.int/web/gaia/dr2-known-issues>`_
   - making covariance matrix from errors and correlation coeffecients.
