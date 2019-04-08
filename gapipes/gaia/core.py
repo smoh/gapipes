@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 __all__ = ['Tap', 'GaiaTapPlus']
 
 
+class QueryError(Exception):
+    pass
+
 class Tap(object):
     """
     Table Acess Protocol service client
@@ -201,7 +204,12 @@ class Tap(object):
             upload_table_name=upload_table_name, output_format=output_format)
         try:
             r.raise_for_status()
-            return Tap.parse_result_table(r, output_format)
+            # NOTE: GaiaArchive has an upstream bug that nothing is returned
+            #       when synchronous queries time out (30 seconds).
+            if r.text:
+                return Tap.parse_result_table(r, output_format)
+            else:
+                raise QueryError("Your synchronous query returned nothing; it probably timed out.")
         except HTTPError as e:
             message = parse_votable_error_response(r)
             raise HTTPError(message) from e
