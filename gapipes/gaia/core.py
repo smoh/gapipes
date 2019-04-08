@@ -514,3 +514,23 @@ class GaiaTapPlus(Tap):
         except HTTPError as e:
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
+
+    def query_sourceid(self, table, source_id_column='source_id', columns='*'):
+        """Query Gaia DR2 gaia_source table for a given list of "source_id"s.
+
+        Parameters
+        ----------
+        table : pd.DataFrame, astropy.table.Table
+            table containing source ids
+        source_id_column : str, optional
+            name of the column containing source_id
+        columns : list, optional
+            List of columns to retrieve
+            (the default is '*', which will get all columns)
+        """
+
+        q = """SELECT {columns} FROM TAP_UPLOAD.table as t JOIN gaiadr2.gaia_source
+        ON gaiadr2.gaia_source.source_id = t.{source_id_column}"""\
+            .format(columns=columns, source_id_column=source_id_column)
+        r = self.query(str(q), upload_resource=table, upload_table_name="table")
+        return r
