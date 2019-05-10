@@ -73,7 +73,7 @@ def test_query_async(tap, mock_post_query):
 
     with patch('gapipes.Tap._post_query', mock_post_query):
 
-        job = tap.query_async("async_query")
+        job = tap.query("async_query", async_=True)
         assert isinstance(job, Job), "Async query did not return a Job"
         assert job.jobid is not None
         assert job.url is not None

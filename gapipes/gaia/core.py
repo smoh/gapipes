@@ -178,8 +178,8 @@ class Tap(object):
 
     def query(self, query, name=None,
               upload_resource=None, upload_table_name=None,
-              output_format='csv'):
-        """Synchronous query to TAP server
+              output_format='csv', async_=False):
+        """Send query to TAP server
 
         Parameters
         ----------
@@ -193,60 +193,41 @@ class Tap(object):
             upload table name
         output_format : str
             one of 'votable', 'votable_plain', 'csv', 'json' or 'fits'
+        async_ : bool
+            True to launch an asynchronous job
 
         Returns
         -------
+        The return type depends on whether you launch a synchronous or asynchronous query.
+
+        For synchronous queries:
         table : pd.DataFrame or astropy.table.Table
             Query result
-        """
-        r = self._post_query(
-            query, name=name, upload_resource=upload_resource,
-            upload_table_name=upload_table_name, output_format=output_format)
-        try:
-            r.raise_for_status()
-            # NOTE: GaiaArchive has an upstream bug that nothing is returned
-            #       when synchronous queries time out (30 seconds).
-            if r.text:
-                return Tap.parse_result_table(r, output_format)
-            else:
-                raise QueryError("Your synchronous query returned nothing; it probably timed out.")
-        except HTTPError as e:
-            message = parse_votable_error_response(r)
-            raise HTTPError(message) from e
-
-    def query_async(self, query, name=None,
-                    upload_resource=None, upload_table_name=None,
-                    output_format="csv",
-                    autorun=True):
-        """
-        Do asynchronous query to server
-
-        Parameters
-        ----------
-        query : str, mandatory
-            query to be executed
-        upload_resource: path to votable file or pandas.DataFrame or astropy.table.Table
-            table to upload
-        upload_table_name: str
-            upload table name
-        output_format : str, optional, default 'votable'
-            results format
-        autorun: boolean, optional, default True
-            if 'True', sets 'phase' parameter to 'RUN',
-            so the framework can start the job.
-
-        Returns
-        -------
+        
+        For asynchronous queries:
         job : Job instance
             use `job.get_result()` to retrieve query result
         """
-        #NOTE: The first response is 303 redirect to Job location
-        # Job location is in the header of redirect response
         r = self._post_query(
             query, name=name, upload_resource=upload_resource,
             upload_table_name=upload_table_name, output_format=output_format,
-            async_=True)
-        return Job.from_response(r, session=self.session)
+            async_=async_)
+        try:
+            r.raise_for_status()
+            if not async_:
+                if r.text:
+                    return Tap.parse_result_table(r, output_format)
+                else:
+                    # NOTE: GaiaArchive has an upstream bug that nothing is returned
+                    #       when synchronous queries time out (30 seconds).
+                    raise QueryError("Your synchronous query returned nothing; it probably timed out.")
+            else:
+                #NOTE: The first response is 303 redirect to Job location
+                # Job location is in the header of redirect response
+                return Job.from_response(r, session=self.session)
+        except HTTPError as e:
+            message = parse_votable_error_response(r)
+            raise HTTPError(message) from e
 
     @classmethod
     def from_url(cls, url, **kwargs):
