@@ -8,13 +8,11 @@ import astropy.coordinates as coord
 import astropy.units as u
 from . import pipes as pp
 
-__all__ = [
-    'GaiaData',
-    'GaiaSource'
-]
+__all__ = ["GaiaData", "GaiaSource"]
 
 # conversion factor from mas/yr * mas to km/s
-_tokms = (u.kpc * (u.mas).to(u.rad)/u.yr).to(u.km/u.s).value
+_tokms = (u.kpc * (u.mas).to(u.rad) / u.yr).to(u.km / u.s).value
+
 
 @pd.api.extensions.register_dataframe_accessor("g")
 class GaiaData(object):
@@ -37,6 +35,7 @@ class GaiaData(object):
     df : pandas.DataFrame, dict-like
         Gaia data table
     """
+
     def __init__(self, df):
         self._validate(df)
         self._df = df
@@ -86,14 +85,40 @@ class GaiaData(object):
     @property
     def vra(self):
         """Velocity [km/s] in R.A. direction"""
-        return self._df['pmra']/self._df['parallax']*_tokms
+        return self._df["pmra"] / self._df["parallax"] * _tokms
 
     @property
     def vdec(self):
         """Velocity [km/s] in Decl. direction"""
-        return self._df['pmdec']/self._df['parallax']*_tokms
+        return self._df["pmdec"] / self._df["parallax"] * _tokms
 
-    def correct_brightsource_pm(self, gmag_threshold=12.):
+    @property
+    def vra_error(self):
+        """Velocity error [km/s] in R.A. direction"""
+        df = self._df
+        vra_error = (
+            np.hypot(
+                df["pmra_error"] / df["parallax"],
+                df["parallax_error"] / df["parallax"] ** 2 * df["pmra"],
+            )
+            * _tokms
+        )
+        return vra_error
+
+    @property
+    def vdec_error(self):
+        """Velocity error [km/s] in Decl. direction"""
+        df = self._df
+        vdec_error = (
+            np.hypot(
+                df["pmdec_error"] / df["parallax"],
+                df["parallax_error"] / df["parallax"] ** 2 * df["pmdec"],
+            )
+            * _tokms
+        )
+        return vdec_error
+
+    def correct_brightsource_pm(self, gmag_threshold=12.0):
         """Correct bright source proper motions for rotation bias.
 
         This function modifies the original DataFrame!
@@ -108,22 +133,23 @@ class GaiaData(object):
         pandas.DataFrame
             original dataframe with pmra, pmdec modified for bright sources.
         """
-        if gmag_threshold > 13.:
-            warnings.warn("This correction should only be applied to bright (G <= 12) sources!")
-        bright = np.array(self._df['phot_g_mean_mag']) < gmag_threshold
+        if gmag_threshold > 13.0:
+            warnings.warn(
+                "This correction should only be applied to bright (G <= 12) sources!"
+            )
+        bright = np.array(self._df["phot_g_mean_mag"]) < gmag_threshold
         pmra, pmdec = pp.correct_brightsource_pm(self._df.loc[bright])
-        self._df.loc[bright, 'pmra'] = pmra
-        self._df.loc[bright, 'pmdec'] = pmdec
+        self._df.loc[bright, "pmra"] = pmra
+        self._df.loc[bright, "pmdec"] = pmdec
         return self._df
 
     def plot_xyz_icrs(self, *args, **kwargs):
         """Plot xyz coordinates in ICRS
         """
         fig, ax = plt.subplots(1, 2, figsize=(8, 4))
-        ax[0].scatter(self.icrs.cartesian.x, self.icrs.cartesian.y, s=2);
-        ax[1].scatter(self.icrs.cartesian.x, self.icrs.cartesian.z, s=2);
+        ax[0].scatter(self.icrs.cartesian.x, self.icrs.cartesian.y, s=2)
+        ax[1].scatter(self.icrs.cartesian.x, self.icrs.cartesian.z, s=2)
         return fig
-
 
 
 @pd.api.extensions.register_series_accessor("g")
@@ -143,6 +169,7 @@ class GaiaSource(object):
     s : pandas.Series, dict-like
         Gaia data table row for one source
     """
+
     def __init__(self, s):
         self._d = s
         self._keys = list(s.keys())
@@ -150,8 +177,9 @@ class GaiaSource(object):
     def open_simbad(self):
         """Open Simbad search for this source in default web browser.
         """
-        url = 'http://simbad.u-strasbg.fr/simbad/sim-basic?Ident={radec}&submit=SIMBAD+search'\
-            .format(radec='{}{:+}'.format(self._d['ra'], self._d['dec']))
+        url = "http://simbad.u-strasbg.fr/simbad/sim-basic?Ident={radec}&submit=SIMBAD+search".format(
+            radec="{}{:+}".format(self._d["ra"], self._d["dec"])
+        )
         webbrowser.open_new_tab(url)
 
     @property
