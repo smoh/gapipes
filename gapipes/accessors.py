@@ -66,15 +66,19 @@ class GaiaData(object):
     def galactic(self):
         return self.icrs.transform_to(coord.Galactic)
 
-    def make_cov(self):
-        """Generate covariance matrix from Gaia table columns
+    def make_cov(self, columns=["parallax", "pmra", "pmdec"]):
+        """Generate covariance matrix from Gaia data
+
+        columns : list
+            list of columns to calculate covariance.
+            Must be a subset of 'ra', 'dec' 'parallax', 'pmra', 'pmdec'.
 
         Returns
         -------
         numpy.array
-            (N, 3, 3) array of parallax, pmra, pmdec covariance matrices
+            (N, number of columns) array of covariance matrices
         """
-        return pp.make_cov(self._df)
+        return pp.make_cov(self._df, columns=columns)
 
     @property
     def distmod(self):
