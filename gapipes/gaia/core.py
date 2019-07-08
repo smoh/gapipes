@@ -1,14 +1,12 @@
 import warnings
 import io
 import logging
-import six
+from urllib.parse import urljoin, urlparse
 import getpass
 import requests
 from requests.exceptions import HTTPError
 import pandas as pd
-
 from astropy.table import Table
-from astropy.extern.six.moves.urllib_parse import urljoin, urlparse
 
 from . import utils
 from .utils import Job, parse_html_error_response, parse_votable_error_response
@@ -301,7 +299,7 @@ class GaiaTapPlus(Tap):
                 user = ins.readline().strip()
                 password = ins.readline().strip()
         if user is None:
-            user = six.moves.input("User: ")
+            user = input("User: ")
             if user is None:
                 print("Invalid user name")
                 return
