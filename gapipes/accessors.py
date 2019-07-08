@@ -207,4 +207,3 @@ class GaiaSource(object):
             (3, 3) array of parallax, pmra, pmdec covariance matrices
         """
         return pp.make_cov(self._d)
-

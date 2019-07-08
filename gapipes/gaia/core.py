@@ -15,11 +15,12 @@ from .utils import Job, parse_html_error_response, parse_votable_error_response
 logger = logging.getLogger(__name__)
 
 
-__all__ = ['Tap', 'GaiaTapPlus']
+__all__ = ["Tap", "GaiaTapPlus"]
 
 
 class QueryError(Exception):
     pass
+
 
 class Tap(object):
     """
@@ -36,17 +37,18 @@ class Tap(object):
     port : int
         HTTP port; Default: 80 for http and 443 for https
     """
+
     _tables = None
     _columns = None
 
-    def __init__(self, host, path, protocol='http', port=80):
+    def __init__(self, host, path, protocol="http", port=80):
         self.protocol = protocol
         self.host = host
         self.path = path
         self.port = port
         self.session = requests.session()
 
-        logger.debug('TAP: {:s}'.format(self.tap_endpoint))
+        logger.debug("TAP: {:s}".format(self.tap_endpoint))
 
     @property
     def tap_endpoint(self):
@@ -79,18 +81,18 @@ class Tap(object):
         format : str
             the table format, e.g., 'csv'
         """
-        if format not in ['votable', 'csv', 'fits']:
-            raise ValueError('format is not recognized')
-        if format == 'csv':
+        if format not in ["votable", "csv", "fits"]:
+            raise ValueError("format is not recognized")
+        if format == "csv":
             return pd.read_csv(io.StringIO(response.text))
-        elif format == 'votable':
+        elif format == "votable":
             # suppress warnings by default
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                return Table.read(io.BytesIO(response.content), format='votable')
-        elif format == 'fits':
-            #TODO: this is broken but I don't know why.
-            return Table.read(io.BytesIO(response.content), format='fits')
+                return Table.read(io.BytesIO(response.content), format="votable")
+        elif format == "fits":
+            # TODO: this is broken but I don't know why.
+            return Table.read(io.BytesIO(response.content), format="fits")
 
     @property
     def tables(self):
@@ -122,48 +124,55 @@ class Tap(object):
         else:
             return self._columns
 
-    def _post_query(self, query, name=None,
-                    upload_resource=None, upload_table_name=None,
-                    output_format='csv',
-                    autorun=True,
-                    async_=False):
+    def _post_query(
+        self,
+        query,
+        name=None,
+        upload_resource=None,
+        upload_table_name=None,
+        output_format="csv",
+        autorun=True,
+        async_=False,
+    ):
         """POST synchronous or asynchronos query to Tap server
 
         Returns unchecked requests.Response
         """
-        if 'select' not in query.lower():
-            with open(query, 'r') as f:
+        if "select" not in query.lower():
+            with open(query, "r") as f:
                 query = f.read()
         args = {
             "REQUEST": "doQuery",
             "LANG": "ADQL",
             "FORMAT": str(output_format),
             # "tapclient": str(TAP_CLIENT_ID),
-            "QUERY": str(query)}
+            "QUERY": str(query),
+        }
         # TODO: is autorun even necessary for sync jobs?
         if autorun is True:
-            args['PHASE'] = 'RUN'
+            args["PHASE"] = "RUN"
         if name is not None:
-            args['jobname'] = name
-        url = self.tap_endpoint + ('/async' if async_ else '/sync')
+            args["jobname"] = name
+        url = self.tap_endpoint + ("/async" if async_ else "/sync")
         logger.debug(args)
 
         if upload_resource is None:
             response = self.session.post(url, data=args)
         else:
             if upload_table_name is None:
-                raise ValueError("Table name is required when a resource " +
-                                 "is uploaded")
+                raise ValueError(
+                    "Table name is required when a resource " + "is uploaded"
+                )
             # UPLOAD should be '[table_name],param:form_key'
-            args['UPLOAD'] = '{0:s},param:{0:s}'.format(upload_table_name)
+            args["UPLOAD"] = "{0:s},param:{0:s}".format(upload_table_name)
             if isinstance(upload_resource, pd.DataFrame):
                 with io.BytesIO() as f:
-                    Table.from_pandas(upload_resource).write(f, format='votable')
+                    Table.from_pandas(upload_resource).write(f, format="votable")
                     f.seek(0)
                     chunk = f.read()
             elif isinstance(upload_resource, Table):
                 with io.BytesIO() as f:
-                    upload_resource.write(f, format='votable')
+                    upload_resource.write(f, format="votable")
                     f.seek(0)
                     chunk = f.read()
             else:
@@ -174,9 +183,15 @@ class Tap(object):
 
         return response
 
-    def query(self, query, name=None,
-              upload_resource=None, upload_table_name=None,
-              output_format='csv', async_=False):
+    def query(
+        self,
+        query,
+        name=None,
+        upload_resource=None,
+        upload_table_name=None,
+        output_format="csv",
+        async_=False,
+    ):
         """Send query to TAP server
 
         Parameters
@@ -207,9 +222,13 @@ class Tap(object):
             use `job.get_result()` to retrieve query result
         """
         r = self._post_query(
-            query, name=name, upload_resource=upload_resource,
-            upload_table_name=upload_table_name, output_format=output_format,
-            async_=async_)
+            query,
+            name=name,
+            upload_resource=upload_resource,
+            upload_table_name=upload_table_name,
+            output_format=output_format,
+            async_=async_,
+        )
         try:
             r.raise_for_status()
             if not async_:
@@ -218,9 +237,11 @@ class Tap(object):
                 else:
                     # NOTE: GaiaArchive has an upstream bug that nothing is returned
                     #       when synchronous queries time out (30 seconds).
-                    raise QueryError("Your synchronous query returned nothing; it probably timed out.")
+                    raise QueryError(
+                        "Your synchronous query returned nothing; it probably timed out."
+                    )
             else:
-                #NOTE: The first response is 303 redirect to Job location
+                # NOTE: The first response is 303 redirect to Job location
                 # Job location is in the header of redirect response
                 return Job.from_response(r, session=self.session)
         except HTTPError as e:
@@ -232,8 +253,8 @@ class Tap(object):
         """
         Make a Tap from url [http(s)://]host[:port][/path]
         """
-        default_port = {'http': 80, 'https':443}
-        if '://' not in url:
+        default_port = {"http": 80, "https": 443}
+        if "://" not in url:
             raise ValueError('`url` must start with "scheme://"')
         parsed_url = urlparse(url)
         protocol = parsed_url.scheme
@@ -245,8 +266,9 @@ class Tap(object):
         return cls(host, path, protocol=protocol, port=port, **kwargs)
 
     def __repr__(self):
-        return '{cls:s}("{s.host:s}", "{s.path:s}", "{s.protocol:s}", {s.port:d})'\
-            .format(s=self, cls=self.__class__.__name__)
+        return '{cls:s}("{s.host:s}", "{s.path:s}", "{s.protocol:s}", {s.port:d})'.format(
+            s=self, cls=self.__class__.__name__
+        )
 
 
 class GaiaTapPlus(Tap):
@@ -262,15 +284,24 @@ class GaiaTapPlus(Tap):
     upload_context : str, optional, default None
         upload context
     """
-    def __init__(self, host, path, protocol='http', port=80,
-                 server_context=None, upload_context=None):
+
+    def __init__(
+        self,
+        host,
+        path,
+        protocol="http",
+        port=80,
+        server_context=None,
+        upload_context=None,
+    ):
 
         super(GaiaTapPlus, self).__init__(host, path, protocol=protocol, port=port)
 
         if not all([v is not None for v in [server_context, upload_context]]):
             raise ValueError(
                 "It does not make sense to initialize `TapPlus`"
-                "without all contexts set. Consider using `Tap`.")
+                "without all contexts set. Consider using `Tap`."
+            )
 
         self._server_context = server_context
         self._upload_context = upload_context
@@ -309,7 +340,7 @@ class GaiaTapPlus(Tap):
                 print("Invalid password")
                 return
         url = "https://{s.host:s}/{s._server_context:s}/login".format(s=self)
-        r = self.session.post(url, data={'username': user, 'password': password})
+        r = self.session.post(url, data={"username": user, "password": password})
         try:
             r.raise_for_status()
             return
@@ -332,7 +363,7 @@ class GaiaTapPlus(Tap):
 
     @property
     def baseurl(self):
-        return '{s.protocol:s}://{s.host:s}/{s._server_context:s}'.format(s=self)
+        return "{s.protocol:s}://{s.host:s}/{s._server_context:s}".format(s=self)
 
     def get_table_info(self, tables=None, only_tables=False, share_accessible=False):
         """
@@ -368,7 +399,7 @@ class GaiaTapPlus(Tap):
         payload = dict(
             tables=tables,
             only_tables=only_tables,
-            share_accessible=True if share_accessible else False
+            share_accessible=True if share_accessible else False,
         )
         r = self.session.get(url, params=payload)
 
@@ -380,12 +411,12 @@ class GaiaTapPlus(Tap):
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
 
-    #TODO: doument all options of upload_resource better.
-    #TODO: make it flexible to handle pandas.DataFrame seamlessly.
-    #TODO: test all options of upload_resource works.
-    def upload_table(self, upload_resource, table_name,
-                     table_description="",
-                     format='votable'):
+    # TODO: doument all options of upload_resource better.
+    # TODO: make it flexible to handle pandas.DataFrame seamlessly.
+    # TODO: test all options of upload_resource works.
+    def upload_table(
+        self, upload_resource, table_name, table_description="", format="votable"
+    ):
         """
         Upload a table to the user private space
 
@@ -405,20 +436,20 @@ class GaiaTapPlus(Tap):
         # url = "https://gea.esac.esa.int/tap-server/Upload"
         logger.debug("upload_table url = {:s}".format(url))
         args = {
-            'TABLE_NAME': table_name,
-            'TABLE_DESC': table_description,
-            'FORMAT': format
+            "TABLE_NAME": table_name,
+            "TABLE_DESC": table_description,
+            "FORMAT": format,
         }
         if isinstance(upload_resource, Table):
             with io.BytesIO() as f:
-                upload_resource.write(f, format='votable')
+                upload_resource.write(f, format="votable")
                 f.seek(0)
                 chunk = f.read()
-                args['FORMAT'] = 'votable'
+                args["FORMAT"] = "votable"
                 files = dict(FILE=chunk)
-        elif upload_resource.startswith('http'):
+        elif upload_resource.startswith("http"):
             files = None
-            args['URL'] = upload_resource
+            args["URL"] = upload_resource
         else:
             with open(upload_resource, "r") as f:
                 chunk = f.read()
@@ -447,7 +478,7 @@ class GaiaTapPlus(Tap):
         args = {
             "TABLE_NAME": str(table_name),
             "DELETE": "TRUE",
-            "FORCE_REMOVAL": "TRUE" if force_removal else "FALSE"
+            "FORCE_REMOVAL": "TRUE" if force_removal else "FALSE",
         }
 
         r = self.session.post(url, data=args)
@@ -458,7 +489,7 @@ class GaiaTapPlus(Tap):
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
 
-    def list_jobs(self, kind='async', offset=0, limit=100):
+    def list_jobs(self, kind="async", offset=0, limit=100):
         """Get the list of jobs from server
 
         Parameters
@@ -482,12 +513,9 @@ class GaiaTapPlus(Tap):
             If you are not logged in, all anonymous jobs will be returned.
         """
         # NOTE: /jobs/sync returns nothing...
-        if kind not in ['sync', 'async']:
+        if kind not in ["sync", "async"]:
             raise ValueError("`kind` must be one of 'sync' or 'async'")
-        args = {
-            "OFFSET": offset,
-            "LIMIT": limit
-        }
+        args = {"OFFSET": offset, "LIMIT": limit}
         url = "{s.tap_endpoint:s}/jobs/{kind:s}".format(s=self, kind=kind)
         logger.debug(url)
 
@@ -495,6 +523,7 @@ class GaiaTapPlus(Tap):
         try:
             r.raise_for_status()
             import xml.etree.ElementTree as ET
+
             root = ET.fromstring(r.content)
             jobs = list(map(Job.parse_xml, root))
             return pd.DataFrame(jobs)
@@ -502,7 +531,7 @@ class GaiaTapPlus(Tap):
             message = parse_html_error_response(r.text)
             raise HTTPError(message) from e
 
-    def query_sourceid(self, table, source_id_column='source_id', columns='*'):
+    def query_sourceid(self, table, source_id_column="source_id", columns="*"):
         """Query Gaia DR2 gaia_source table for a given list of "source_id"s.
 
         Parameters
@@ -517,7 +546,8 @@ class GaiaTapPlus(Tap):
         """
 
         q = """SELECT {columns} FROM TAP_UPLOAD.table as t JOIN gaiadr2.gaia_source
-        ON gaiadr2.gaia_source.source_id = t.{source_id_column}"""\
-            .format(columns=columns, source_id_column=source_id_column)
+        ON gaiadr2.gaia_source.source_id = t.{source_id_column}""".format(
+            columns=columns, source_id_column=source_id_column
+        )
         r = self.query(str(q), upload_resource=table, upload_table_name="table")
         return r

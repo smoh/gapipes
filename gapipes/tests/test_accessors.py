@@ -78,4 +78,3 @@ def test_correct_brightsource_pm():
     # only first source should be modified in pm
     assert not np.allclose(df.loc[0, ["pmra", "pmdec"]].values, [-1, 0.0])
     assert np.allclose(df.loc[1, ["pmra", "pmdec"]].values, [-1.2, 0.0])
-
