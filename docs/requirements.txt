@@ -1,5 +1,4 @@
 nbsphinx
 IPython
 matplotlib
-
-
+sphinx_typlog_theme
