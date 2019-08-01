@@ -6,20 +6,19 @@
 Welcome to gapipes!
 ===================
 
-**gapipes** is a lightweight collection of routines to fetch and work with `Gaia <#>`_ data.
+**gapipes** is a lightweight collection of routines to fetch and work with the
+`Gaia <https://www.cosmos.esa.int/web/gaia/data>`_ data.
 
 It provides
 
-- sensible and tested interface to `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_
-- `pandas pipes <http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.pipe.html>`_ to process Gaia DataFrames quickly and easily
+- sensible and tested `Gaia TAP+ <http://gea.esac.esa.int/archive/>`_ client to fetch the data
 - `custom accessors <https://pandas.pydata.org/pandas-docs/stable/development/extending.html>`_ to pandas DataFrame and Series to do common operations on the Gaia data such as
 
   - making astropy `coordinates <http://docs.astropy.org/en/stable/coordinates/index.html>`_ objects
   - calculating `renormalized unit weight error <https://www.cosmos.esa.int/web/gaia/dr2-known-issues>`_
   - making covariance matrix from errors and correlation coeffecients.
 
-.. note::
-  The code is very much under `active development <https://github.com/smoh/gapipes>`_.
+**NOTE** The code is very much under `active development <https://github.com/smoh/gapipes>`_.
 
 
 .. code-block:: python
@@ -47,12 +46,5 @@ User Guide
    :maxdepth: 2
 
    getting-started
-   using-pipes
-
-
-
-.. toctree::
-   :maxdepth: 2
-   :hidden:
-
+   using-accessors-and-pipes
    api
