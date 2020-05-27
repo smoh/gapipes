@@ -182,7 +182,7 @@ class GaiaSource(object):
         """Open Simbad search for this source in default web browser.
         """
         url = "http://simbad.u-strasbg.fr/simbad/sim-basic?Ident={radec}&submit=SIMBAD+search".format(
-            radec="{}{:+}".format(self._d["ra"], self._d["dec"])
+            radec="{}{:+f}".format(self._d["ra"], self._d["dec"])
         )
         webbrowser.open_new_tab(url)
 
