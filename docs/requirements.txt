@@ -2,3 +2,4 @@ nbsphinx
 IPython
 matplotlib
 sphinx_typlog_theme
+sphinx_copybutton
