@@ -6,7 +6,7 @@ from astropy.table import Table
 
 @pytest.fixture
 def gaiatap():
-    return Tap.from_url("http://gea.esac.esa.int:80/tap-server/tap")
+    return Tap.from_url("https://gea.esac.esa.int/tap-server/tap")
 
 
 class TestTap(object):
