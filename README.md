@@ -1,6 +1,5 @@
 # gapipes
 
-[![Build Status](https://travis-ci.org/smoh/gapipes.svg?branch=master)](https://travis-ci.org/smoh/gapipes)
 <a href="https://smoh.space/gapipes"><img src="https://github.com/smoh/gapipes/workflows/docs/badge.svg"></a>
 
 

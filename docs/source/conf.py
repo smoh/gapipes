@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "gapipes"
-copyright = "2018, Semyeong Oh"
+copyright = "2018-2020, Semyeong Oh"
 author = "Semyeong Oh"
 
 # The short X.Y version
