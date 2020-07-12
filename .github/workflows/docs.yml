@@ -39,14 +39,14 @@ jobs:
         run: |
           source activate myenv
           cd docs
-          make html
+          make docs
       - name: Publish to gh-pages
         run: |
           mkdir ghpages
           cd ghpages
           git clone -b gh-pages --single-branch https://smoh:${{ secrets.GITHUB_TOKEN }}@github.com/smoh/gapipes.git .
           rm -rf .git *
-          mv ../docs/_build/html/* .
+          mv ../docs/build/html/* .
           git init
           git add -f *
           touch .nojekyll
