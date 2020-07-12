@@ -18,7 +18,7 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-gaia:
+docs:
 	make clean
+	jupyter nbconvert source/gen-index.ipynb --to rst --output=index
 	make html
-	open build/html/index.html

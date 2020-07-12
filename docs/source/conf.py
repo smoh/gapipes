@@ -45,7 +45,9 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
     "nbsphinx",
+    "sphinx_copybutton"
 ]
 
 napoleon_google_docstring = False
@@ -96,6 +98,8 @@ html_theme_options = {
     "description": "Lightweight collection of routines for fast exploration of Gaia+",
     "github_user": "smoh",
     "github_repo": "gapipes",
+    "logo_name":"gapipes",
+    "warning": "The code in under active development!"
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -112,7 +116,7 @@ html_static_path = ["_static"]
 # 'searchbox.html']``.
 #
 html_sidebars = {
-    "**": ["localtoc.html", "relations.html", "sourcelink.html", "searchbox.html"]
+    "**": ["logo.html", "github.html", "globaltoc.html", "sourcelink.html", "searchbox.html"]
 }
 
 
@@ -196,3 +200,63 @@ epub_exclude_files = ["search.html"]
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+
+
+
+
+# Automagically do "autosummary" of all public methods or attributes (incl. property)
+# Adapted from https://stackoverflow.com/questions/20569011/python-sphinx-autosummary-automated-listing-of-member-functions
+# https://github.com/markovmodel/PyEMMA/blob/devel/doc/source/conf.py
+def setup(app):
+
+
+    from sphinx.application import Sphinx
+    from sphinx.ext.autosummary import Autosummary
+    from sphinx.ext.autosummary import get_documenter
+    from docutils.parsers.rst import directives
+    from sphinx.util.inspect import safe_getattr
+    import re
+
+    class AutoAutoSummary(Autosummary):
+
+        option_spec = {
+            'methods': directives.unchanged,
+            'attributes': directives.unchanged,
+        }
+
+        required_arguments = 1
+
+        @staticmethod
+        def get_members(obj, typ, include_public=0):
+            if not include_public:
+                include_public = []
+            items = []
+            for name in dir(obj):
+                try:
+                    documenter = get_documenter(app, safe_getattr(obj, name), obj)
+                except AttributeError:
+                    continue
+                except Exception as e:
+                    print(e)
+                if documenter.objtype in typ:
+                    items.append(name)
+            public = [x for x in items if x in include_public or not x.startswith('_')]
+            return public, items
+
+        def run(self):
+            clazz = str(self.arguments[0])
+            try:
+                (module_name, class_name) = clazz.rsplit('.', 1)
+                m = __import__(module_name, globals(), locals(), [class_name])
+                c = getattr(m, class_name)
+                if 'methods' in self.options:
+                    _, methods = self.get_members(c, ['method'], ['__init__'])
+                    self.content = ["~%s.%s" % (clazz, method) for method in methods if not method.startswith('_')]
+                if 'attributes' in self.options:
+                    _, attribs = self.get_members(c, ['attribute', 'property'])
+                    self.content = ["~%s.%s" % (clazz, attrib) for attrib in attribs if not attrib.startswith('_')]
+            finally:
+                return super(AutoAutoSummary, self).run()
+
+    app.add_directive('autoautosummary', AutoAutoSummary)
