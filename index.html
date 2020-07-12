@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to gapipes! &mdash; gapipes 0.0.0 documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono"><link rel="stylesheet" href="_static/typlog.css?v=0.7.3" type="text/css" />
+  <link rel="stylesheet" href="_static/theme.css?v=0.7.3" type="text/css" /><link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="index" title="Index" href="genindex.html"/>
+      <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="gapipes 0.0.0 documentation" href="#"/>
+      <link rel="next" title="Accessing GaiaArchive with TAP+" href="getting-started.html"/>
+  <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-37308551-2');ga('send', 'pageview');</script>
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="gapipes">
+  <meta property="og:title" content="Welcome to gapipes!">
+    <meta property="og:description" content="Lightweight collection of routines for fast exploration of Gaia+">
+  <meta name="twitter:card" content="summary">
+</head>
+<body role="document" data-page="index">
+  <header class="t-head">
+    <div class="t-head_menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M64 384h384v-42.666H64V384zm0-106.666h384v-42.667H64v42.667zM64 128v42.665h384V128H64z"/></svg></div>
+    <a class="t-head_logo" href="#">gapipes
+    </a>
+  </header>
+  <aside class="t-sidebar">
+    <div class="t-sidebar_close">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M405 136.798L375.202 107 256 226.202 136.798 107 107 136.798 226.202 256 107 375.202 136.798 405 256 285.798 375.202 405 405 375.202 285.798 256z"/></svg>
+    </div>
+    <div class="inner">
+<a class="logo" href="#">
+    gapipes
+</a><div class="logo_desc">Lightweight collection of routines for fast exploration of Gaia+</div>
+<div class="github_wrap">
+  <a class="github" href="https://github.com/smoh/gapipes" target="_blank">
+    <span class="github_icon"></span>
+    <span class="github_stars">
+      <strong>-</strong>stars
+    </span>
+    <span class="github_forks">
+      <strong>-</strong>forks
+    </span>
+  </a>
+</div><div class="globaltoc">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Accessing GaiaArchive with TAP+</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Why-another-Gaia-TAP-client?">Why another Gaia TAP client?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Inspecting-table-meta-data">Inspecting table meta data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#Getting-information-about-specific-table(s)">Getting information about specific table(s)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Query-the-Gaia-database">Query the Gaia database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#Synchronous-queries">Synchronous queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#Asynchronous-queries">Asynchronous queries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Using-authenticated-service">Using authenticated service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#Managing-user-tables">Managing user tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using-accessors-and-pipes.html">Using pandas accessors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using-accessors-and-pipes.html#What-are-pandas-accessors?">What are pandas accessors?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#summary-of-custom-methods-and-attributes">Summary of custom methods and attributes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#under-dataframe-g">Under DataFrame.g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#under-series-g">Under Series.g</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#accessors">Accessors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-gapipes.pipes">Pipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#gaia">Gaia</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-gapipes.gaia.utils">Utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox">
+  <form class="search" action="search.html" method="get">
+    <div class="input-group">
+      <input type="text" name="q" placeholder="Search" />
+      <button type="submit">Go</button>
+    </div>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </div>
+  </aside>
+  <div class="t-content">
+    <div class="t-body yue">
+      <div class="versionchanged">
+        <p>The code in under active development!</p>
+      </div>
+      
+  <div class="section" id="welcome-to-gapipes">
+<h1>Welcome to gapipes!<a class="headerlink" href="#welcome-to-gapipes" title="Permalink to this headline">¶</a></h1>
+<p><strong>gapipes</strong> is a <a class="reference external" href="http://pandas.pydata.org">pandas</a>-centric
+lightweight collection of routines to fetch and work with the
+<a class="reference external" href="https://www.cosmos.esa.int/web/gaia/data">Gaia</a> data.</p>
+<p>It provides</p>
+<ul class="simple">
+<li><p>sensible and tested <a class="reference external" href="http://gea.esac.esa.int/archive/">Gaia TAP+</a>
+client to fetch the data</p></li>
+<li><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/development/extending.html">custom
+accessors</a>
+to pandas DataFrame and Series to do common operations on the Gaia
+data such as</p>
+<ul>
+<li><p>making astropy
+<a class="reference external" href="http://docs.astropy.org/en/stable/coordinates/index.html">coordinates</a>
+objects</p></li>
+<li><p>calculating <a class="reference external" href="https://www.cosmos.esa.int/web/gaia/dr2-known-issues">renormalized unit weight
+error</a></p></li>
+<li><p>making covariance matrix from errors and correlation coefficients.</p></li>
+</ul>
+</li>
+</ul>
+<div class="section" id="a-quick-tour">
+<h2>A quick tour<a class="headerlink" href="#a-quick-tour" title="Permalink to this headline">¶</a></h2>
+<p>Say you have some Gaia data. Let’s quickly fetch some from the Gaia
+archive.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">gapipes</span> <span class="k">as</span> <span class="nn">gp</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">select top 50 *</span>
+<span class="s2">from gaiadr2.gaia_source</span>
+<span class="s2">where</span>
+<span class="s2">1=contains(point(&#39;&#39;, ra, dec),</span>
+<span class="s2">           circle(&#39;&#39;, 130.226, 19.665, 1))</span>
+<span class="s2">and parallax between 4.613 and 7.312</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">df</span></code> is a pandas Dataframe containing gaia sources.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="s1">&#39;rows&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt; 50 rows
+</pre></div>
+</div>
+<p>When you import gapipes, it registers a custom accessor <code class="docutils literal notranslate"><span class="pre">g</span></code>, under
+which there is a collection of common operations. Let’s just work with
+first 5 rows for display purpose.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Make astropy ICRS coordinate instance with proper motion and radial
+velocity:</p></li>
+</ul>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">icrs</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ICRS</span> <span class="n">Coordinate</span><span class="p">:</span> <span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">deg</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">pc</span><span class="p">)</span>
+    <span class="p">[(</span><span class="mf">130.12157181</span><span class="p">,</span> <span class="mf">18.79627847</span><span class="p">,</span> <span class="mf">181.87376145</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">130.05526312</span><span class="p">,</span> <span class="mf">18.72393993</span><span class="p">,</span> <span class="mf">190.20501526</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">130.13982678</span><span class="p">,</span> <span class="mf">18.67443893</span><span class="p">,</span> <span class="mf">188.26622276</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">130.24423701</span><span class="p">,</span> <span class="mf">18.67500043</span><span class="p">,</span> <span class="mf">152.59152456</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">130.06723764</span><span class="p">,</span> <span class="mf">18.79161546</span><span class="p">,</span> <span class="mf">209.60959948</span><span class="p">)]</span>
+ <span class="p">(</span><span class="n">pm_ra_cosdec</span><span class="p">,</span> <span class="n">pm_dec</span><span class="p">,</span> <span class="n">radial_velocity</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mas</span> <span class="o">/</span> <span class="n">yr</span><span class="p">,</span> <span class="n">mas</span> <span class="o">/</span> <span class="n">yr</span><span class="p">,</span> <span class="n">km</span> <span class="o">/</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">[(</span><span class="o">-</span><span class="mf">60.7075949</span> <span class="p">,</span> <span class="o">-</span><span class="mf">52.76753264</span><span class="p">,</span>         <span class="n">nan</span><span class="p">),</span>
+     <span class="p">(</span><span class="o">-</span><span class="mf">35.80150307</span><span class="p">,</span> <span class="o">-</span><span class="mf">12.40964744</span><span class="p">,</span>         <span class="n">nan</span><span class="p">),</span>
+     <span class="p">(</span><span class="o">-</span><span class="mf">37.06980874</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.88689953</span><span class="p">,</span> <span class="mf">29.54114051</span><span class="p">),</span>
+     <span class="p">(</span><span class="o">-</span><span class="mf">33.0232434</span> <span class="p">,</span>  <span class="o">-</span><span class="mf">5.58953023</span><span class="p">,</span> <span class="mf">36.23858577</span><span class="p">),</span>
+     <span class="p">(</span><span class="o">-</span><span class="mf">22.05408719</span><span class="p">,</span> <span class="o">-</span><span class="mf">19.82573781</span><span class="p">,</span>  <span class="mf">9.80905085</span><span class="p">)]</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Make astropy Galactic coordinate instance:</p></li>
+</ul>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">galactic</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">Galactic</span> <span class="n">Coordinate</span><span class="p">:</span> <span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">deg</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">pc</span><span class="p">)</span>
+    <span class="p">[(</span><span class="mf">206.89277308</span><span class="p">,</span> <span class="mf">32.19810551</span><span class="p">,</span> <span class="mf">181.87376145</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">206.94629392</span><span class="p">,</span> <span class="mf">32.1137144</span> <span class="p">,</span> <span class="mf">190.20501526</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">207.03459301</span><span class="p">,</span> <span class="mf">32.17095501</span><span class="p">,</span> <span class="mf">188.26622276</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">207.07558656</span><span class="p">,</span> <span class="mf">32.26359033</span><span class="p">,</span> <span class="mf">152.59152456</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">206.87635259</span><span class="p">,</span> <span class="mf">32.14836265</span><span class="p">,</span> <span class="mf">209.60959948</span><span class="p">)]</span>
+ <span class="p">(</span><span class="n">pm_l_cosb</span><span class="p">,</span> <span class="n">pm_b</span><span class="p">,</span> <span class="n">radial_velocity</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mas</span> <span class="o">/</span> <span class="n">yr</span><span class="p">,</span> <span class="n">mas</span> <span class="o">/</span> <span class="n">yr</span><span class="p">,</span> <span class="n">km</span> <span class="o">/</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">[(</span>        <span class="n">nan</span><span class="p">,</span>          <span class="n">nan</span><span class="p">,</span>         <span class="n">nan</span><span class="p">),</span>
+     <span class="p">(</span>        <span class="n">nan</span><span class="p">,</span>          <span class="n">nan</span><span class="p">,</span>         <span class="n">nan</span><span class="p">),</span>
+     <span class="p">(</span><span class="o">-</span><span class="mf">2.08990742</span><span class="p">,</span> <span class="o">-</span><span class="mf">38.87288757</span><span class="p">,</span> <span class="mf">29.54114051</span><span class="p">),</span>
+     <span class="p">(</span><span class="o">-</span><span class="mf">6.52731056</span><span class="p">,</span> <span class="o">-</span><span class="mf">32.85074839</span><span class="p">,</span> <span class="mf">36.23858577</span><span class="p">),</span>
+     <span class="p">(</span><span class="mf">10.70417661</span><span class="p">,</span> <span class="o">-</span><span class="mf">27.65616106</span><span class="p">,</span>  <span class="mf">9.80905085</span><span class="p">)]</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Make <code class="docutils literal notranslate"><span class="pre">[parallax,</span> <span class="pre">pmra,</span> <span class="pre">pmdec]</span></code> 3x3 covariance matrix (using
+<code class="docutils literal notranslate"><span class="pre">&quot;*_error&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;parallax_pmra_corr&quot;</span></code>, … columns)</p></li>
+</ul>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">make_cov</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span> <span class="mf">0.03407061</span><span class="p">,</span>  <span class="mf">0.03978523</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01119716</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.03978523</span><span class="p">,</span>  <span class="mf">0.0693536</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.01736009</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.01119716</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01736009</span><span class="p">,</span>  <span class="mf">0.01528202</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.05322305</span><span class="p">,</span>  <span class="mf">0.04000269</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01155556</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.04000269</span><span class="p">,</span>  <span class="mf">0.1277317</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.03569367</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.01155556</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03569367</span><span class="p">,</span>  <span class="mf">0.04880749</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.00363713</span><span class="p">,</span>  <span class="mf">0.00340469</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00060153</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.00340469</span><span class="p">,</span>  <span class="mf">0.00880243</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00189437</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.00060153</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00189437</span><span class="p">,</span>  <span class="mf">0.0036257</span> <span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.06099286</span><span class="p">,</span>  <span class="mf">0.06141351</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01816473</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.06141351</span><span class="p">,</span>  <span class="mf">0.13105763</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03839579</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.01816473</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.03839579</span><span class="p">,</span>  <span class="mf">0.04169299</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.00185897</span><span class="p">,</span>  <span class="mf">0.00182671</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00045218</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.00182671</span><span class="p">,</span>  <span class="mf">0.00437075</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00137452</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.00045218</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00137452</span><span class="p">,</span>  <span class="mf">0.00190053</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<p>The same accessor is available for pandas.Series that contains one row
+of gaia_source table, i.e., data for a single source.</p>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">s</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">solution_id</span>                                           <span class="mi">1635721458409799680</span>
+<span class="n">designation</span>                                   <span class="n">Gaia</span> <span class="n">DR2</span> <span class="mi">659494740858299264</span>
+<span class="n">source_id</span>                                              <span class="mi">659494740858299264</span>
+<span class="n">random_index</span>                                                    <span class="mi">642953719</span>
+<span class="n">ref_epoch</span>                                                          <span class="mf">2015.5</span>
+                                              <span class="o">...</span>
+<span class="n">lum_val</span>                                                               <span class="n">NaN</span>
+<span class="n">lum_percentile_lower</span>                                                  <span class="n">NaN</span>
+<span class="n">lum_percentile_upper</span>                                                  <span class="n">NaN</span>
+<span class="n">datalink_url</span>            <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gea</span><span class="o">.</span><span class="n">esac</span><span class="o">.</span><span class="n">esa</span><span class="o">.</span><span class="n">int</span><span class="o">/</span><span class="n">data</span><span class="o">-</span><span class="n">server</span><span class="o">/</span><span class="n">datalink</span><span class="o">/...</span>
+<span class="n">epoch_photometry_url</span>                                                  <span class="n">NaN</span>
+<span class="n">Name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Length</span><span class="p">:</span> <span class="mi">96</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Make astropy ICRS coordinate object</p></li>
+</ul>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">icrs</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ICRS</span> <span class="n">Coordinate</span><span class="p">:</span> <span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">distance</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">deg</span><span class="p">,</span> <span class="n">deg</span><span class="p">,</span> <span class="n">pc</span><span class="p">)</span>
+    <span class="p">(</span><span class="mf">130.12157181</span><span class="p">,</span> <span class="mf">18.79627847</span><span class="p">,</span> <span class="mf">181.87376145</span><span class="p">)</span>
+ <span class="p">(</span><span class="n">pm_ra_cosdec</span><span class="p">,</span> <span class="n">pm_dec</span><span class="p">,</span> <span class="n">radial_velocity</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">mas</span> <span class="o">/</span> <span class="n">yr</span><span class="p">,</span> <span class="n">mas</span> <span class="o">/</span> <span class="n">yr</span><span class="p">,</span> <span class="n">km</span> <span class="o">/</span> <span class="n">s</span><span class="p">)</span>
+    <span class="p">(</span><span class="o">-</span><span class="mf">60.7075949</span><span class="p">,</span> <span class="o">-</span><span class="mf">52.76753264</span><span class="p">,</span> <span class="n">nan</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Open Simbad coordinate search for this source in default web browser.</p></li>
+</ul>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">open_simbad</span><span class="p">()</span> <span class="c1"># will open the page in your browser</span>
+</pre></div>
+</div>
+<p>Have a look at <a class="reference internal" href="api.html#summary-custom"><span class="std std-ref">Summary of custom methods and attributes</span></a> for all methods and attributes.</p>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Accessing GaiaArchive with TAP+</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Why-another-Gaia-TAP-client?">Why another Gaia TAP client?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Inspecting-table-meta-data">Inspecting table meta data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Query-the-Gaia-database">Query the Gaia database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#Using-authenticated-service">Using authenticated service</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using-accessors-and-pipes.html">Using pandas accessors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using-accessors-and-pipes.html#What-are-pandas-accessors?">What are pandas accessors?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#summary-of-custom-methods-and-attributes">Summary of custom methods and attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#accessors">Accessors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-gapipes.pipes">Pipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#gaia">Gaia</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+  <div class="t-pagination clearfix">
+    <span style="float:right">
+      <a href="getting-started.html" title="Accessing GaiaArchive with TAP+">Accessing GaiaArchive with TAP+</a> →
+    </span>
+  </div>
+
+    </div><footer class="t-foot">
+    &copy; Copyright 2018-2020, Semyeong Oh.
+    <br>
+    A <a href="https://typlog.com/">typlog</a> <a href="https://github.com/typlog/sphinx-typlog-theme">sphinx theme</a>,
+    designed by <a href="https://lepture.com/">Hsiaoming Yang</a>.
+</footer>
+  </div>
+  <script>$(function(){$(".t-head_menu").on("click",function(){$("body").addClass("_expand")});$(".t-body").on("click",function(){$("body").removeClass("_expand")});$(".t-sidebar_close").on("click",function(){$("body").removeClass("_expand")});$("a.footnote-reference").on("click",function(e){e.preventDefault();var id=$(this).attr("href");var html=$(id).find("td.label + td").html();var w=Math.max(document.documentElement.clientWidth,window.innerWidth||0);var style="top:"+e.pageY+"px;";if(w>560){style+="width:480px;";if(e.pageX>240&&e.pageX+240<w){style+="left:"+(e.pageX-240)+"px;"}else if(e.pageX<=240){style+="left:20px;"}else{style+="right:20px;"}}showFootnote(html,style)});function showFootnote(html,style){var CONTENT_ID="typlog-footnote-content";var content=document.getElementById(CONTENT_ID);if(!content){content=document.createElement("div");content.id=CONTENT_ID;$(".t-body").append(content)}var MASK_ID="typlog-footnote-mask";var mask=document.getElementById(MASK_ID);if(!mask){mask=document.createElement("div");mask.id=MASK_ID;document.body.appendChild(mask);mask.addEventListener("click",function(){content.className="";mask.className=""})}content.innerHTML=html;content.setAttribute("style",style);content.className="_active";mask.className="_active"}function fetchGitHubRepo(repo){var url="https://api.github.com/repos/"+repo;$.getJSON(url,function(data){var counts=[+new Date,data.stargazers_count,data.forks_count];localStorage.setItem("gh:"+repo,JSON.stringify(counts));updateGitHubStats(counts[1],counts[2])})}function updateGitHubStats(stars,forks){$(".github_stars strong").text(stars);$(".github_forks strong").text(forks)}function initGitHub(url){if(!url){return}var repo=url.replace("https://github.com/","");var cache=localStorage.getItem("gh:"+repo);if(cache){try{var counts=JSON.parse(cache);updateGitHubStats(counts[1],counts[2]);var delta=new Date-counts[0];if(delta<0||delta>9e5){fetchGitHubRepo(repo)}}catch(error){fetchGitHubRepo(repo)}}else{fetchGitHubRepo(repo)}}initGitHub($(".github").attr("href"))});</script>
+</body>
+</html>

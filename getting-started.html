@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessing GaiaArchive with TAP+ &mdash; gapipes 0.0.0 documentation</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono"><link rel="stylesheet" href="_static/typlog.css?v=0.7.3" type="text/css" />
+  <link rel="stylesheet" href="_static/theme.css?v=0.7.3" type="text/css" /><link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="index" title="Index" href="genindex.html"/>
+      <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="gapipes 0.0.0 documentation" href="index.html"/>
+      <link rel="next" title="Using pandas accessors" href="using-accessors-and-pipes.html"/>
+      <link rel="prev" title="Welcome to gapipes!" href="index.html"/>
+  <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-37308551-2');ga('send', 'pageview');</script>
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="gapipes">
+  <meta property="og:title" content="Accessing GaiaArchive with TAP+">
+    <meta property="og:description" content="Lightweight collection of routines for fast exploration of Gaia+">
+  <meta name="twitter:card" content="summary">
+</head>
+<body role="document" data-page="getting-started">
+  <header class="t-head">
+    <div class="t-head_menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M64 384h384v-42.666H64V384zm0-106.666h384v-42.667H64v42.667zM64 128v42.665h384V128H64z"/></svg></div>
+    <a class="t-head_logo" href="index.html">gapipes
+    </a>
+  </header>
+  <aside class="t-sidebar">
+    <div class="t-sidebar_close">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M405 136.798L375.202 107 256 226.202 136.798 107 107 136.798 226.202 256 107 375.202 136.798 405 256 285.798 375.202 405 405 375.202 285.798 256z"/></svg>
+    </div>
+    <div class="inner">
+<a class="logo" href="index.html">
+    gapipes
+</a><div class="logo_desc">Lightweight collection of routines for fast exploration of Gaia+</div>
+<div class="github_wrap">
+  <a class="github" href="https://github.com/smoh/gapipes" target="_blank">
+    <span class="github_icon"></span>
+    <span class="github_stars">
+      <strong>-</strong>stars
+    </span>
+    <span class="github_forks">
+      <strong>-</strong>forks
+    </span>
+  </a>
+</div><div class="globaltoc">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Accessing GaiaArchive with TAP+</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Why-another-Gaia-TAP-client?">Why another Gaia TAP client?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Inspecting-table-meta-data">Inspecting table meta data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Getting-information-about-specific-table(s)">Getting information about specific table(s)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Query-the-Gaia-database">Query the Gaia database</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Synchronous-queries">Synchronous queries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Asynchronous-queries">Asynchronous queries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Using-authenticated-service">Using authenticated service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Managing-user-tables">Managing user tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using-accessors-and-pipes.html">Using pandas accessors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using-accessors-and-pipes.html#What-are-pandas-accessors?">What are pandas accessors?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#summary-of-custom-methods-and-attributes">Summary of custom methods and attributes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#under-dataframe-g">Under DataFrame.g</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#under-series-g">Under Series.g</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#accessors">Accessors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-gapipes.pipes">Pipes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#gaia">Gaia</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#module-gapipes.gaia.utils">Utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting-started.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox">
+  <form class="search" action="search.html" method="get">
+    <div class="input-group">
+      <input type="text" name="q" placeholder="Search" />
+      <button type="submit">Go</button>
+    </div>
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    </div>
+  </aside>
+  <div class="t-content">
+    <div class="t-body yue">
+      <div class="versionchanged">
+        <p>The code in under active development!</p>
+      </div>
+      
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="section" id="Accessing-GaiaArchive-with-TAP+">
+<h1>Accessing GaiaArchive with TAP+<a class="headerlink" href="#Accessing-GaiaArchive-with-TAP+" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we go through how to access, examine and use Gaia TAP+ service using <strong>gapipes</strong>. For databases as large as Gaia (and many other large astronomical surveys for that matter), downloading everything as a set of files is no longer practical. The Table Access Protocol (TAP) was designed for the purpse of communicating general tabular data by the <a class="reference external" href="http://www.ivoa.net/">IVOA</a>. For <a class="reference external" href="http://gea.esac.esa.int/archive/">Gaia</a> and other ESA Services, the ESDC extended this protocol,
+called TAP+. The extension includes user table space, sharing tables among groups, and listing jobs.</p>
+<div class="section" id="Why-another-Gaia-TAP-client?">
+<h2>Why another Gaia TAP client?<a class="headerlink" href="#Why-another-Gaia-TAP-client?" title="Permalink to this headline">¶</a></h2>
+<p>There is already a TAP python client in the popular <a class="reference external" href="https://astroquery.readthedocs.io/en/latest/">astroquery</a>. So why another one?</p>
+<p>The current implementation in astroquery is excessively verbose, has clunky api design, does not report an informative error message and does not nicely cover all the ‘quarks’ of GaiaArchive. This module is written more or less out of frustration. If astroquery eventually change to implementation that uses <a class="reference external" href="http://pyvo.readthedocs.io">pyvo</a>, which has a much well-defined code structure and cleaner interface, this module can retire.</p>
+</div>
+<div class="section" id="Getting-started">
+<h2>Getting started<a class="headerlink" href="#Getting-started" title="Permalink to this headline">¶</a></h2>
+<p>In <strong>gapipes</strong>, there are two core classes that interfaces these services: one for plain TAP (<code class="docutils literal notranslate"><span class="pre">gapipes.TAP</span></code>) and one for GaiaTAP+ (<code class="docutils literal notranslate"><span class="pre">gapipes.GaiaTapPlus</span></code>). While they are written so that you can point at any available service, a default instance <code class="docutils literal notranslate"><span class="pre">gapipes.gaia</span></code> is already defined pointing at <a class="reference external" href="http://gea.esac.esa.int/archive/">the official Gaia Archive</a>.</p>
+<p><strong>NOTE</strong> Following <a class="reference external" href="https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it">Yagni</a> principle, <strong>gapipes</strong> does not implement <em>all</em> <a class="reference external" href="http://gea.esac.esa.int/archive-help/index.html">capabilities of Gaia TAP+</a> such as sharing tables with other users. If you need any missing feature of Gaia TAP+ in <strong>gapipes</strong>, feel free to open <a class="reference external" href="https://github.com/smoh/gapipes">an issue or a pull request</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">gapipes</span> <span class="k">as</span> <span class="nn">gp</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">gaia</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+GaiaTapPlus(&#34;gea.esac.esa.int&#34;, &#34;/tap-server/tap&#34;, &#34;https&#34;, 443)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Inspecting-table-meta-data">
+<h2>Inspecting table meta data<a class="headerlink" href="#Inspecting-table-meta-data" title="Permalink to this headline">¶</a></h2>
+<p>The list of tables and columns available can be inspected using <code class="docutils literal notranslate"><span class="pre">tables</span></code> and <code class="docutils literal notranslate"><span class="pre">columns</span></code> attribute, which are pandas DataFrames.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;total number of tables:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">tables</span><span class="p">))</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+total number of tables: 80
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>schema</th>
+      <th>table_name</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>hipparcos original catalogue (J1991.25)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>public</td>
+      <td>hipparcos_newreduction</td>
+      <td>Hipparcos New Reduction: The Astrometric Catal...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>public</td>
+      <td>hubble_sc</td>
+      <td>Hubble Source Catalogue</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>public</td>
+      <td>igsl_source</td>
+      <td>null</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>public</td>
+      <td>igsl_source_catalog_ids</td>
+      <td>SourceId in original  catalogues</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>schema</th>
+      <th>table_name</th>
+      <th>column_name</th>
+      <th>unit</th>
+      <th>dtype</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>astroref</td>
+      <td></td>
+      <td>VARCHAR</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>bd</td>
+      <td></td>
+      <td>VARCHAR</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>btmag</td>
+      <td></td>
+      <td>REAL</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>b_v</td>
+      <td></td>
+      <td>REAL</td>
+      <td></td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>ccdm</td>
+      <td></td>
+      <td>VARCHAR</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>So you can easily filter these tables using pandas methods.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;schema == &quot;public&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>schema</th>
+      <th>table_name</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>hipparcos original catalogue (J1991.25)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>public</td>
+      <td>hipparcos_newreduction</td>
+      <td>Hipparcos New Reduction: The Astrometric Catal...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>public</td>
+      <td>hubble_sc</td>
+      <td>Hubble Source Catalogue</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>public</td>
+      <td>igsl_source</td>
+      <td>null</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>public</td>
+      <td>igsl_source_catalog_ids</td>
+      <td>SourceId in original  catalogues</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>public</td>
+      <td>tycho2</td>
+      <td>The Tycho-2 Catalogue is an astrometric refere...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>public</td>
+      <td>dual</td>
+      <td>auxiliary table to be used as dummy from</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">tables</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;table_name == &quot;gaia_source&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>schema</th>
+      <th>table_name</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>37</th>
+      <td>gaiadr1</td>
+      <td>gaia_source</td>
+      <td>This table has an entry for every Gaia observe...</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>This table has an entry for every Gaia observe...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Have a look at one particular table in detail.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;(table_name == &quot;gaia_source&quot;) &amp; schema == &quot;gaiadr2&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>schema</th>
+      <th>table_name</th>
+      <th>column_name</th>
+      <th>unit</th>
+      <th>dtype</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1531</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>solution_id</td>
+      <td></td>
+      <td>BIGINT</td>
+      <td>Solution Identifier</td>
+    </tr>
+    <tr>
+      <th>1532</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>designation</td>
+      <td></td>
+      <td>VARCHAR</td>
+      <td>Unique source designation (unique across all D...</td>
+    </tr>
+    <tr>
+      <th>1533</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>source_id</td>
+      <td></td>
+      <td>BIGINT</td>
+      <td>Unique source identifier (unique within a part...</td>
+    </tr>
+    <tr>
+      <th>1534</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>random_index</td>
+      <td></td>
+      <td>BIGINT</td>
+      <td>Random index used to select subsets</td>
+    </tr>
+    <tr>
+      <th>1535</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>ref_epoch</td>
+      <td>yr</td>
+      <td>DOUBLE</td>
+      <td>Reference epoch</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="Getting-information-about-specific-table(s)">
+<h3>Getting information about specific table(s)<a class="headerlink" href="#Getting-information-about-specific-table(s)" title="Permalink to this headline">¶</a></h3>
+<p>You can also get information about specific tables with GaiaTAP+.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tables</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">get_table_info</span><span class="p">(</span><span class="n">only_tables</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tables</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>schema</th>
+      <th>table_name</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>public</td>
+      <td>hipparcos</td>
+      <td>hipparcos original catalogue (J1991.25)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>public</td>
+      <td>hipparcos_newreduction</td>
+      <td>Hipparcos New Reduction: The Astrometric Catal...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>public</td>
+      <td>hubble_sc</td>
+      <td>Hubble Source Catalogue</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>public</td>
+      <td>igsl_source</td>
+      <td>null</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>public</td>
+      <td>igsl_source_catalog_ids</td>
+      <td>SourceId in original  catalogues</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>75</th>
+      <td>gaiadr2</td>
+      <td>vari_short_timescale</td>
+      <td>This table describes the short-timescale sourc...</td>
+    </tr>
+    <tr>
+      <th>76</th>
+      <td>gaiadr2</td>
+      <td>vari_time_series_statistics</td>
+      <td>Statistical parameters of time series, using o...</td>
+    </tr>
+    <tr>
+      <th>77</th>
+      <td>gaiadr2</td>
+      <td>panstarrs1_original_valid</td>
+      <td>The Panoramic Survey Telescope and Rapid Respo...</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>gaiadr2</td>
+      <td>gaia_source</td>
+      <td>This table has an entry for every Gaia observe...</td>
+    </tr>
+    <tr>
+      <th>79</th>
+      <td>gaiadr2</td>
+      <td>ruwe</td>
+      <td>This table contains the Renormalised Unit Weig...</td>
+    </tr>
+  </tbody>
+</table>
+<p>80 rows × 3 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># count number of columns for each schema</span>
+<span class="n">columns</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;schema&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pandas.core.groupby.generic.DataFrameGroupBy object at 0x7fb817c87c50&gt;
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Query-the-Gaia-database">
+<h2>Query the Gaia database<a class="headerlink" href="#Query-the-Gaia-database" title="Permalink to this headline">¶</a></h2>
+<p>There are two kinds of queries supported: synchronous and asynchonous.</p>
+<p>Let’s start with synchonous queries.</p>
+<div class="section" id="Synchronous-queries">
+<h3>Synchronous queries<a class="headerlink" href="#Synchronous-queries" title="Permalink to this headline">¶</a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">.query</span></code> to send an ADQL query to the database. The default behaviour is to request output in csv format and read resulting table as pandas.DataFrame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">r</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;select top 10 * from gaiadr2.gaia_source&#39;</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s1">&#39;display.max_columns&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;display.max_colwidth&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>solution_id</th>
+      <th>designation</th>
+      <th>source_id</th>
+      <th>random_index</th>
+      <th>...</th>
+      <th>lum_percentile_lower</th>
+      <th>lum_percentile_upper</th>
+      <th>datalink_url</th>
+      <th>epoch_photometry_url</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>163572...</td>
+      <td>Gaia D...</td>
+      <td>387526...</td>
+      <td>459847817</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https:...</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>163572...</td>
+      <td>Gaia D...</td>
+      <td>387502...</td>
+      <td>229923908</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https:...</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>163572...</td>
+      <td>Gaia D...</td>
+      <td>387646...</td>
+      <td>114961954</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https:...</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>163572...</td>
+      <td>Gaia D...</td>
+      <td>387506...</td>
+      <td>57480977</td>
+      <td>...</td>
+      <td>0.909308</td>
+      <td>1.484657</td>
+      <td>https:...</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>163572...</td>
+      <td>Gaia D...</td>
+      <td>387649...</td>
+      <td>108811...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https:...</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 96 columns</p>
+</div></div>
+</div>
+<p>Wrong queries will raise exception with a useful message from the server.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">r</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;select top 5 * from foo.bar&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">HTTPError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">~/projects/gapipes/gapipes/gaia/core.py</span> in <span class="ansi-cyan-fg">query</span><span class="ansi-blue-fg">(self, query, name, upload_resource, upload_table_name, output_format)</span>
+<span class="ansi-green-intense-fg ansi-bold">    194</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 195</span><span class="ansi-red-fg">             </span>r<span class="ansi-blue-fg">.</span>raise_for_status<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    196</span>             <span class="ansi-green-fg">return</span> Tap<span class="ansi-blue-fg">.</span>parse_result_table<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">,</span> output_format<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/miniconda3/envs/research/lib/python3.7/site-packages/requests/models.py</span> in <span class="ansi-cyan-fg">raise_for_status</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    938</span>         <span class="ansi-green-fg">if</span> http_error_msg<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 939</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> HTTPError<span class="ansi-blue-fg">(</span>http_error_msg<span class="ansi-blue-fg">,</span> response<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    940</span>
+
+<span class="ansi-red-fg">HTTPError</span>: 500 Server Error: 500 for url: https://gea.esac.esa.int/tap-server/tap/sync
+
+The above exception was the direct cause of the following exception:
+
+<span class="ansi-red-fg">HTTPError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-9-baaf9fa1f68b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>r <span class="ansi-blue-fg">=</span> gp<span class="ansi-blue-fg">.</span>gaia<span class="ansi-blue-fg">.</span>query<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#39;select top 5 * from foo.bar&#39;</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/projects/gapipes/gapipes/gaia/core.py</span> in <span class="ansi-cyan-fg">query</span><span class="ansi-blue-fg">(self, query, name, upload_resource, upload_table_name, output_format)</span>
+<span class="ansi-green-intense-fg ansi-bold">    197</span>         <span class="ansi-green-fg">except</span> HTTPError <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    198</span>             message <span class="ansi-blue-fg">=</span> parse_votable_error_response<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 199</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> HTTPError<span class="ansi-blue-fg">(</span>message<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">from</span> e
+<span class="ansi-green-intense-fg ansi-bold">    200</span>
+<span class="ansi-green-intense-fg ansi-bold">    201</span>     def query_async(self, query, name=None,
+
+<span class="ansi-red-fg">HTTPError</span>: Cannot parse query &#39;select top 5 * from foo.bar&#39; for job &#39;1550666502785O&#39;: 1 unresolved identifiers: bar [l.1 c.21 - l.1 c.28] !
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Asynchronous-queries">
+<h3>Asynchronous queries<a class="headerlink" href="#Asynchronous-queries" title="Permalink to this headline">¶</a></h3>
+<p>For a more complicated queries that takes longer than 30 seconds, use <code class="docutils literal notranslate"><span class="pre">.query_async</span></code>. The interface is the same except the return value is now a <code class="docutils literal notranslate"><span class="pre">Job</span></code> instance.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">select</span>
+<span class="s2">    count(*) as n,</span>
+<span class="s2">    round(phot_g_mean_mag, 1) as val</span>
+<span class="s2">from</span>
+<span class="s2">    gaiadr1.tgas_source</span>
+<span class="s2">group by val</span>
+<span class="s2">order by val</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">j</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">query_async</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;histogram&#39;</span><span class="p">)</span>
+<span class="n">j</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Job(jobid=&#39;1550666562163O&#39;, phase=&#39;EXECUTING&#39;)
+</pre></div></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">.get_result</span></code> to wait until the job is finished and download the result.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%%time</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">get_result</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+CPU times: user 29.2 ms, sys: 11.7 ms, total: 40.9 ms
+Wall time: 3.42 s
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">r</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/getting-started_25_0.png" src="_images/getting-started_25_0.png" />
+</div>
+</div>
+<p>Inspect <code class="docutils literal notranslate"><span class="pre">Job</span></code> if needed.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+select
+    count(*) as n,
+    round(phot_g_mean_mag, 1) as val
+from
+    gaiadr1.tgas_source
+group by val
+order by val
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">result_url</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+https://gea.esac.esa.int/tap-server/tap/async/1550666562163O
+https://gea.esac.esa.int/tap-server/tap/async/1550666562163O/results/result
+</pre></div></div>
+</div>
+</div>
+</div>
+<div class="section" id="Using-authenticated-service">
+<h2>Using authenticated service<a class="headerlink" href="#Using-authenticated-service" title="Permalink to this headline">¶</a></h2>
+<p>There are some benefits to using Gaia TAP+ authenticated service (with an account).</p>
+<p>Log in and out of server using <code class="docutils literal notranslate"><span class="pre">gp.gaia.login</span></code> and <code class="docutils literal notranslate"><span class="pre">gp.gaia.logout</span></code>.</p>
+<p><strong>NOTE</strong>:</p>
+<ul class="simple">
+<li><p>Once you are logged in, the result of <code class="docutils literal notranslate"><span class="pre">get_table_info</span></code> method includes your user tables if any.</p></li>
+<li><p>Once you are logged in, <code class="docutils literal notranslate"><span class="pre">list_jobs</span></code> method only lists jobs you launched.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">login</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+User:  soh
+Password:  ············
+</pre></div></div>
+</div>
+<div class="section" id="Managing-user-tables">
+<h3>Managing user tables<a class="headerlink" href="#Managing-user-tables" title="Permalink to this headline">¶</a></h3>
+<p>Once you login, you can upload your own tables to user space.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+<span class="n">mytable</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">])))</span>
+<span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">upload_table</span><span class="p">(</span><span class="n">mytable</span><span class="p">,</span> <span class="s1">&#39;foobar123&#39;</span><span class="p">,</span> <span class="n">table_description</span><span class="o">=</span><span class="s1">&#39;test table to demonstrate upload&#39;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#34;Uploaded file (size: 0) into &#39;foobar123&#39;&#34;
+</pre></div></div>
+</div>
+<p>Let’s check if the table is there.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;select * from user_soh.foobar123;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>foobar123_oid</th>
+      <th>a</th>
+      <th>b</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>2</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>3</td>
+      <td>6</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>Now let’s delete.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">delete_user_table</span><span class="p">(</span><span class="s1">&#39;foobar123&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#34;Table &#39;foobar123&#39; removed.&#34;
+</pre></div></div>
+</div>
+<p>If we try to query a deleted table, we should get an error.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gp</span><span class="o">.</span><span class="n">gaia</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;select * from user_soh.foobar123;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">HTTPError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">~/projects/gapipes/gapipes/gaia/core.py</span> in <span class="ansi-cyan-fg">query</span><span class="ansi-blue-fg">(self, query, name, upload_resource, upload_table_name, output_format)</span>
+<span class="ansi-green-intense-fg ansi-bold">    202</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 203</span><span class="ansi-red-fg">             </span>r<span class="ansi-blue-fg">.</span>raise_for_status<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    204</span>             <span class="ansi-green-fg">return</span> Tap<span class="ansi-blue-fg">.</span>parse_result_table<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">,</span> output_format<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/miniconda3/envs/research/lib/python3.7/site-packages/requests/models.py</span> in <span class="ansi-cyan-fg">raise_for_status</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-intense-fg ansi-bold">    938</span>         <span class="ansi-green-fg">if</span> http_error_msg<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 939</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> HTTPError<span class="ansi-blue-fg">(</span>http_error_msg<span class="ansi-blue-fg">,</span> response<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    940</span>
+
+<span class="ansi-red-fg">HTTPError</span>: 500 Server Error: 500 for url: https://gea.esac.esa.int/tap-server/tap/sync
+
+The above exception was the direct cause of the following exception:
+
+<span class="ansi-red-fg">HTTPError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-8-b26c452954ec&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>gp<span class="ansi-blue-fg">.</span>gaia<span class="ansi-blue-fg">.</span>query<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">&#39;select * from user_soh.foobar123;&#39;</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/projects/gapipes/gapipes/gaia/core.py</span> in <span class="ansi-cyan-fg">query</span><span class="ansi-blue-fg">(self, query, name, upload_resource, upload_table_name, output_format)</span>
+<span class="ansi-green-intense-fg ansi-bold">    205</span>         <span class="ansi-green-fg">except</span> HTTPError <span class="ansi-green-fg">as</span> e<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">    206</span>             message <span class="ansi-blue-fg">=</span> parse_votable_error_response<span class="ansi-blue-fg">(</span>r<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-fg">--&gt; 207</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">raise</span> HTTPError<span class="ansi-blue-fg">(</span>message<span class="ansi-blue-fg">)</span> <span class="ansi-green-fg">from</span> e
+<span class="ansi-green-intense-fg ansi-bold">    208</span>
+<span class="ansi-green-intense-fg ansi-bold">    209</span>     def query_async(self, query, name=None,
+
+<span class="ansi-red-fg">HTTPError</span>: Cannot parse query &#39;select * from user_soh.foobar123;&#39; for job &#39;1553653744533O&#39;: 1 unresolved identifiers: foobar123 [l.1 c.15 - l.1 c.33] !
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+
+  <div class="t-pagination clearfix">
+    <span>
+      ← <a href="index.html" title="Welcome to gapipes!">Welcome to gapipes!</a>
+    </span>
+    <span style="float:right">
+      <a href="using-accessors-and-pipes.html" title="Using pandas accessors">Using pandas accessors</a> →
+    </span>
+  </div>
+
+    </div><footer class="t-foot">
+    &copy; Copyright 2018-2020, Semyeong Oh.
+    <br>
+    A <a href="https://typlog.com/">typlog</a> <a href="https://github.com/typlog/sphinx-typlog-theme">sphinx theme</a>,
+    designed by <a href="https://lepture.com/">Hsiaoming Yang</a>.
+</footer>
+  </div>
+  <script>$(function(){$(".t-head_menu").on("click",function(){$("body").addClass("_expand")});$(".t-body").on("click",function(){$("body").removeClass("_expand")});$(".t-sidebar_close").on("click",function(){$("body").removeClass("_expand")});$("a.footnote-reference").on("click",function(e){e.preventDefault();var id=$(this).attr("href");var html=$(id).find("td.label + td").html();var w=Math.max(document.documentElement.clientWidth,window.innerWidth||0);var style="top:"+e.pageY+"px;";if(w>560){style+="width:480px;";if(e.pageX>240&&e.pageX+240<w){style+="left:"+(e.pageX-240)+"px;"}else if(e.pageX<=240){style+="left:20px;"}else{style+="right:20px;"}}showFootnote(html,style)});function showFootnote(html,style){var CONTENT_ID="typlog-footnote-content";var content=document.getElementById(CONTENT_ID);if(!content){content=document.createElement("div");content.id=CONTENT_ID;$(".t-body").append(content)}var MASK_ID="typlog-footnote-mask";var mask=document.getElementById(MASK_ID);if(!mask){mask=document.createElement("div");mask.id=MASK_ID;document.body.appendChild(mask);mask.addEventListener("click",function(){content.className="";mask.className=""})}content.innerHTML=html;content.setAttribute("style",style);content.className="_active";mask.className="_active"}function fetchGitHubRepo(repo){var url="https://api.github.com/repos/"+repo;$.getJSON(url,function(data){var counts=[+new Date,data.stargazers_count,data.forks_count];localStorage.setItem("gh:"+repo,JSON.stringify(counts));updateGitHubStats(counts[1],counts[2])})}function updateGitHubStats(stars,forks){$(".github_stars strong").text(stars);$(".github_forks strong").text(forks)}function initGitHub(url){if(!url){return}var repo=url.replace("https://github.com/","");var cache=localStorage.getItem("gh:"+repo);if(cache){try{var counts=JSON.parse(cache);updateGitHubStats(counts[1],counts[2]);var delta=new Date-counts[0];if(delta<0||delta>9e5){fetchGitHubRepo(repo)}}catch(error){fetchGitHubRepo(repo)}}else{fetchGitHubRepo(repo)}}initGitHub($(".github").attr("href"))});</script>
+</body>
+</html>
